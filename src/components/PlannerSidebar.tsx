@@ -56,15 +56,16 @@ export function PlannerSidebar() {
         </SidebarCard>
 
         {/* Budget */}
-        <SidebarCard title="Max Budget">
+        <SidebarCard title="Max Budget per Attraction">
           <motion.div {...fadeProps}>
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center mb-1">
               <div className="flex items-center gap-1.5 text-muted-foreground">
                 <Wallet className="w-3.5 h-3.5" />
-                <span className="text-xs">Per attraction</span>
+                <span className="text-xs font-medium">Spend limit per spot</span>
               </div>
               <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">€{budget}</span>
             </div>
+            <p className="text-[10px] text-muted-foreground/70 mb-2">Max you'd pay for a single attraction — not the whole trip.</p>
             <input type="range" min={0} max={300} step={5} value={budget} onChange={e => setBudget(Number(e.target.value))} className="w-full sidebar-range" style={{ '--range-progress': `${(budget / 300) * 100}%` } as React.CSSProperties} />
             <div className="flex justify-between text-[10px] text-muted-foreground mt-1"><span>€0</span><span>€300</span></div>
           </motion.div>
