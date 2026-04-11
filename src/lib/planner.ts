@@ -129,14 +129,9 @@ export function getTransportRecommendation(
       label = 'Take Public Transit';
       break;
     }
-    case 'bike':
-      rideMinutes = Math.round((distanceKm / SPEED.bike) * 60);
-      totalMinutes = rideMinutes;
-      label = 'Bike to next stop';
-      break;
     case 'taxi':
       rideMinutes = Math.round((distanceKm / SPEED.taxi) * 60);
-      totalMinutes = rideMinutes + 2; // 2 min pickup wait
+      totalMinutes = rideMinutes + 2;
       waitMinutes = 2;
       label = 'Take Taxi';
       break;
