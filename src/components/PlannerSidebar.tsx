@@ -16,7 +16,7 @@ const viewTransition = {
   initial: { opacity: 0, x: -12 },
   animate: { opacity: 1, x: 0 },
   exit: { opacity: 0, x: 12 },
-  transition: { duration: 0.25, ease: 'easeOut' },
+  transition: { duration: 0.25, ease: [0.25, 0.1, 0.25, 1] as const },
 };
 
 export function PlannerSidebar() {
