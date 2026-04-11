@@ -109,8 +109,6 @@ export function PlannerSidebar() {
                 <span>Back to Search</span>
               </button>
 
-              {/* Weather */}
-              <WeatherCard cityName={selectedCity.name} weather={weather} loading={loading} error={error} />
 
               {/* Packing */}
               <WeatherPackingCard />
