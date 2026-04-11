@@ -3,6 +3,7 @@ import { PlannerProvider, usePlanner } from '@/context/PlannerContext';
 import { PlannerSidebar } from '@/components/PlannerSidebar';
 import { TimelinePanel } from '@/components/TimelinePanel';
 import { MapPanel } from '@/components/MapPanel';
+import { TripLoadingOverlay } from '@/components/TripLoadingOverlay';
 import { useWeather } from '@/hooks/useWeather';
 import { Menu, X, Globe } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -44,7 +45,7 @@ function PlannerLayout() {
       </header>
 
       {/* Main */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {/* Desktop sidebar */}
         <div className="hidden lg:flex w-[280px] shrink-0 h-full overflow-y-auto border-r border-border bg-card">
           <PlannerSidebar />
@@ -55,6 +56,11 @@ function PlannerLayout() {
         </div>
 
         <MapPanel />
+
+        {/* Loading overlay */}
+        <AnimatePresence>
+          <TripLoadingOverlay />
+        </AnimatePresence>
 
         {/* Mobile hamburger FAB */}
         <button
