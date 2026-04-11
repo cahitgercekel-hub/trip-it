@@ -129,46 +129,6 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     if (c === 'AT') setDTicketMode(false);
   };
 
-  const generateTrip = useCallback(async () => {
-    if (tripLoading) return;
-    setTripLoading(true);
-    setTripGenerated(false);
-    setAiItinerary(null);
-    setLoadingStep(0);
-
-    // Start loading animation
-    let step = 0;
-    const interval = setInterval(() => {
-      step++;
-      if (step < LOADING_STEPS.length - 1) {
-        setLoadingStep(step);
-      }
-    }, 700);
-
-    try {
-      // Compute filtered POIs at call time
-      const currentCity = CITIES_DATA.find(c => c.id === cityId) || CITIES_DATA[0];
-      const request = buildItineraryRequest(
-        currentCity.name,
-        filteredPois,
-        dayStartTime,
-        dayEndTime,
-        tripInterests,
-        stepGoal,
-      );
-      const response = await generateItinerary(request);
-      setAiItinerary(response.itinerary);
-    } catch (err) {
-      console.error('Failed to generate itinerary:', err);
-      setAiItinerary(null);
-    } finally {
-      clearInterval(interval);
-      setLoadingStep(LOADING_STEPS.length - 1);
-      setTripLoading(false);
-      setTripGenerated(true);
-    }
-  }, [tripLoading, cityId, filteredPois, dayStartTime, dayEndTime, tripInterests, stepGoal]);
-
   const cities = useMemo(() => CITIES_DATA.filter(c => c.country === country), [country]);
   const selectedCity = useMemo(() => CITIES_DATA.find(c => c.id === cityId) || CITIES_DATA[0], [cityId]);
 
@@ -194,6 +154,43 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     steps: getTotalSteps(filteredPois),
     distance: getTotalDistance(filteredPois),
   }), [filteredPois, isicActive]);
+
+  const generateTrip = useCallback(async () => {
+    if (tripLoading) return;
+    setTripLoading(true);
+    setTripGenerated(false);
+    setAiItinerary(null);
+    setLoadingStep(0);
+
+    let step = 0;
+    const interval = setInterval(() => {
+      step++;
+      if (step < LOADING_STEPS.length - 1) {
+        setLoadingStep(step);
+      }
+    }, 700);
+
+    try {
+      const request = buildItineraryRequest(
+        selectedCity.name,
+        filteredPois,
+        dayStartTime,
+        dayEndTime,
+        tripInterests,
+        stepGoal,
+      );
+      const response = await generateItinerary(request);
+      setAiItinerary(response.itinerary);
+    } catch (err) {
+      console.error('Failed to generate itinerary:', err);
+      setAiItinerary(null);
+    } finally {
+      clearInterval(interval);
+      setLoadingStep(LOADING_STEPS.length - 1);
+      setTripLoading(false);
+      setTripGenerated(true);
+    }
+  }, [tripLoading, selectedCity, filteredPois, dayStartTime, dayEndTime, tripInterests, stepGoal]);
 
   return (
     <PlannerContext.Provider value={{
