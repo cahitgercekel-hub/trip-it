@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { usePlanner } from '@/context/PlannerContext';
+import { Landmark, TreePine, Ticket } from 'lucide-react';
 
 function MapController() {
   const { selectedCity } = usePlanner();
@@ -21,26 +22,28 @@ function createMarkerIcon(category: 'Culture' | 'Nature') {
   return L.divIcon({
     className: '',
     html: `<div class="custom-marker ${cls}">${emoji}</div>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
   });
 }
 
 export function MapPanel() {
-  const { selectedCity, filteredPois, mapFilter, setMapFilter, isicActive, country, cityId, setCityId, cities } = usePlanner();
+  const { selectedCity, filteredPois, mapFilter, setMapFilter, isicActive, cityId, setCityId, cities } = usePlanner();
 
   return (
     <div className="flex-1 h-screen relative">
       {/* Top bar */}
-      <div className="absolute top-4 left-4 right-4 z-[1000] flex items-center justify-between">
+      <div className="absolute top-3 left-3 right-3 z-[1000] flex items-center justify-between gap-3">
         {/* City tabs */}
-        <div className="flex items-center gap-1 bg-card/80 backdrop-blur-md border border-foreground/10 rounded-xl px-2 py-1 overflow-x-auto max-w-[60%]">
+        <div className="flex items-center gap-0.5 bg-card/95 backdrop-blur-sm border border-border rounded-lg px-1.5 py-1 overflow-x-auto max-w-[65%] shadow-card">
           {cities.map(c => (
             <button
               key={c.id}
               onClick={() => setCityId(c.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                c.id === cityId ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+              className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all ${
+                c.id === cityId
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
               }`}
             >
               {c.name}
@@ -49,15 +52,21 @@ export function MapPanel() {
         </div>
 
         {/* Filter pills */}
-        <div className="flex gap-1 bg-card/80 backdrop-blur-md border border-foreground/10 rounded-xl px-2 py-1">
+        <div className="flex gap-0.5 bg-card/95 backdrop-blur-sm border border-border rounded-lg px-1.5 py-1 shadow-card">
           {(['All', 'Culture', 'Nature'] as const).map(f => (
             <button
               key={f}
               onClick={() => setMapFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                mapFilter === f ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5 ${
+                mapFilter === f
+                  ? f === 'Culture' ? 'bg-culture text-primary-foreground shadow-sm'
+                    : f === 'Nature' ? 'bg-nature text-primary-foreground shadow-sm'
+                    : 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
               }`}
             >
+              {f === 'Culture' && <Landmark className="w-3 h-3" />}
+              {f === 'Nature' && <TreePine className="w-3 h-3" />}
               {f}
             </button>
           ))}
@@ -65,15 +74,16 @@ export function MapPanel() {
       </div>
 
       {/* Legend */}
-      <div className="absolute bottom-8 left-4 z-[1000] bg-card/60 backdrop-blur-md border border-foreground/10 rounded-xl p-3">
+      <div className="absolute bottom-6 left-3 z-[1000] bg-card/95 backdrop-blur-sm border border-border rounded-lg px-3 py-2.5 shadow-card">
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Legend</p>
         <div className="flex flex-col gap-1.5 text-xs">
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-indigo" />
-            <span className="text-muted-foreground">Culture</span>
+            <div className="w-5 h-5 rounded-full bg-culture flex items-center justify-center text-[10px]">🏛️</div>
+            <span className="text-foreground font-medium">Culture</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-emerald" />
-            <span className="text-muted-foreground">Nature</span>
+            <div className="w-5 h-5 rounded-full bg-nature flex items-center justify-center text-[10px]">🌿</div>
+            <span className="text-foreground font-medium">Nature</span>
           </div>
         </div>
       </div>
@@ -84,22 +94,30 @@ export function MapPanel() {
         className="w-full h-full"
         zoomControl={false}
       >
-        <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
+        <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
         <MapController />
         {filteredPois.map(poi => (
           <Marker key={poi.id} position={[poi.lat, poi.lng]} icon={createMarkerIcon(poi.category)}>
             <Popup>
-              <div className="text-sm">
-                <p className="font-semibold">{poi.name}</p>
-                <p className="text-xs mt-1">{poi.category}</p>
-                <div className="flex gap-1 mt-1 flex-wrap">
+              <div className="text-sm min-w-[160px]">
+                <p className="font-bold text-foreground">{poi.name}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{poi.category}</p>
+                <div className="flex gap-1.5 mt-2 flex-wrap">
                   {poi.isFree ? (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-emerald/20 text-emerald">Free</span>
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-nature-light text-nature">Free</span>
                   ) : (
-                    <span className="text-xs">€{isicActive && poi.hasISIC ? Math.round(poi.price * 0.5) : poi.price}</span>
+                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-secondary text-foreground">
+                      €{isicActive && poi.hasISIC ? Math.round(poi.price * 0.5) : poi.price}
+                    </span>
                   )}
-                  {poi.hasISIC && <span className="text-xs px-1.5 py-0.5 rounded bg-indigo/20 text-indigo">ISIC</span>}
-                  {poi.dTicket && <span className="text-xs px-1.5 py-0.5 rounded bg-primary/20 text-primary">D-Ticket</span>}
+                  {poi.hasISIC && (
+                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-culture-light text-culture">ISIC</span>
+                  )}
+                  {poi.dTicket && (
+                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary flex items-center gap-1">
+                      <Ticket className="w-3 h-3" /> D-Ticket
+                    </span>
+                  )}
                 </div>
               </div>
             </Popup>
