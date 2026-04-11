@@ -12,7 +12,7 @@ import { HeadingToCard } from '@/components/sidebar/HeadingToCard';
 import { DatesCard } from '@/components/sidebar/DatesCard';
 import { WeatherPackingCard } from '@/components/sidebar/WeatherPackingCard';
 import { CostEstimationCard } from '@/components/sidebar/CostEstimationCard';
-import { FlightCard } from '@/components/sidebar/FlightCard';
+
 
 const STORAGE_KEY = 'tageplan_sidebar_collapsed';
 
