@@ -52,7 +52,7 @@ export function TimelinePanel() {
   });
 
   return (
-    <div className="relative flex">
+    <div className="relative flex" style={{ minWidth: collapsed ? 20 : undefined }}>
       <motion.div
         animate={{ width: collapsed ? 0 : 340, opacity: collapsed ? 0 : 1 }}
         transition={{ type: 'spring', stiffness: 280, damping: 28 }}
