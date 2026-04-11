@@ -169,3 +169,54 @@ input[type="range"]::-moz-range-thumb {
 .marker-nature {
   background: hsl(152 69% 40%);
 }
+
+/* ─── Sidebar range slider with filled active track ─── */
+.sidebar-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    hsl(var(--primary)) 0%,
+    hsl(var(--primary)) var(--range-progress),
+    hsl(var(--muted)) var(--range-progress),
+    hsl(var(--muted)) 100%
+  );
+  outline: none;
+  cursor: pointer;
+}
+.sidebar-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  border: 2px solid hsl(var(--primary-foreground));
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.sidebar-range::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+.sidebar-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  border: 2px solid hsl(var(--primary-foreground));
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+.sidebar-range::-moz-range-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: transparent;
+}
+.sidebar-range::-moz-range-progress {
+  height: 6px;
+  border-radius: 9999px;
+  background: hsl(var(--primary));
+}
