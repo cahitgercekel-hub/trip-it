@@ -17,7 +17,7 @@ export function PlannerSidebar() {
     country, stepGoal, setStepGoal, budget, setBudget,
     dTicketMode, setDTicketMode, freeOnly, setFreeOnly,
     isicActive, setIsicActive, selectedCity,
-    tripGenerated, setTripGenerated,
+    tripGenerated, tripLoading, generateTrip,
   } = usePlanner();
 
   const { weather, loading, error } = useWeather(selectedCity.center[0], selectedCity.center[1]);
@@ -80,10 +80,11 @@ export function PlannerSidebar() {
 
         {/* Trip It! Button */}
         <button
-          onClick={() => setTripGenerated(true)}
-          className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold text-sm shadow-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
+          onClick={() => generateTrip()}
+          disabled={tripLoading}
+          className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold text-sm shadow-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          🚀 Trip It!
+          {tripLoading ? '⏳ Generating...' : '🚀 Trip It!'}
         </button>
 
         {/* Post-analysis: Weather, Packing, Cost — only after Trip It! */}

@@ -3,6 +3,7 @@ import { PlannerProvider, usePlanner } from '@/context/PlannerContext';
 import { PlannerSidebar } from '@/components/PlannerSidebar';
 import { TimelinePanel } from '@/components/TimelinePanel';
 import { MapPanel } from '@/components/MapPanel';
+import { TripLoadingOverlay } from '@/components/TripLoadingOverlay';
 import { useWeather } from '@/hooks/useWeather';
 import { Menu, X, Globe } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
