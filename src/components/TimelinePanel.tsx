@@ -1,7 +1,7 @@
 import { usePlanner } from '@/context/PlannerContext';
 import { haversine } from '@/lib/planner';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Landmark, TreePine, Droplets, TrainFront, Ticket, X, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Landmark, TreePine, Droplets, TrainFront, Ticket, X, PanelLeftClose, ChevronRight } from 'lucide-react';
 import type { POI } from '@/data/cities';
 import { useState, useEffect } from 'react';
 
