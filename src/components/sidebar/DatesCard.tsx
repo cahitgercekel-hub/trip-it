@@ -12,7 +12,7 @@ export function DatesCard() {
   const handleArrivalChange = (d: Date | undefined) => {
     setArrivalDate(d);
     // Reset departure if it's now out of range
-    if (d && departureDate && departureDate > addDays(d, 2)) {
+    if (d && departureDate && departureDate > addDays(d, 1)) {
       setDepartureDate(undefined);
     }
   };
@@ -20,7 +20,7 @@ export function DatesCard() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const maxDeparture = arrivalDate ? addDays(arrivalDate, 2) : undefined;
+  const maxDeparture = arrivalDate ? addDays(arrivalDate, 1) : undefined;
 
   return (
     <div className="bg-card border border-border rounded-xl p-3.5 shadow-card">
@@ -67,7 +67,7 @@ export function DatesCard() {
               onSelect={setDepartureDate}
               disabled={(date) => {
                 if (!arrivalDate) return date < today;
-                return date < arrivalDate || date > addDays(arrivalDate, 2);
+                return date < arrivalDate || date > addDays(arrivalDate, 1);
               }}
               initialFocus
               className={cn("p-3 pointer-events-auto")}
@@ -77,7 +77,7 @@ export function DatesCard() {
       </div>
 
       <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed">
-        Trips are currently limited to a maximum of 2 days.
+        Trips are currently limited to a maximum of 1 night.
       </p>
     </div>
   );
