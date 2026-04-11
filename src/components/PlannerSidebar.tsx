@@ -99,7 +99,7 @@ export function PlannerSidebar() {
                 </div>
                 <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">{stepGoal.toLocaleString()}</span>
               </div>
-              <input type="range" min={3000} max={20000} step={500} value={stepGoal} onChange={e => setStepGoal(Number(e.target.value))} className="w-full" />
+              <input type="range" min={3000} max={20000} step={500} value={stepGoal} onChange={e => setStepGoal(Number(e.target.value))} className="w-full sidebar-range" style={{ '--range-progress': `${((stepGoal - 3000) / (20000 - 3000)) * 100}%` } as React.CSSProperties} />
               <div className="flex justify-between text-[10px] text-muted-foreground mt-1"><span>3,000</span><span>20,000</span></div>
             </motion.div>
           </SidebarCard>
@@ -118,7 +118,7 @@ export function PlannerSidebar() {
                 </div>
                 <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">€{budget}</span>
               </div>
-              <input type="range" min={0} max={100} step={5} value={budget} onChange={e => setBudget(Number(e.target.value))} className="w-full" />
+              <input type="range" min={0} max={100} step={5} value={budget} onChange={e => setBudget(Number(e.target.value))} className="w-full sidebar-range" style={{ '--range-progress': `${(budget / 100) * 100}%` } as React.CSSProperties} />
               <div className="flex justify-between text-[10px] text-muted-foreground mt-1"><span>€0</span><span>€100</span></div>
             </motion.div>
           </SidebarCard>
