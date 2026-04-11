@@ -151,17 +151,36 @@ export function PlannerSidebar() {
           </SidebarCard>
         )}
 
-        {/* Weather & Packing + Cost Estimation */}
-        {collapsed ? (
-          <>
-            <CollapsedIcon icon={<Shirt className="w-4 h-4" />} label="Weather & Packing" />
-            <CollapsedIcon icon={<Wallet className="w-4 h-4" />} label="Cost Estimation" />
-          </>
-        ) : (
-          <motion.div {...fadeProps} className="flex flex-col gap-3">
-            <WeatherPackingCard />
-            <CostEstimationCard />
+        {/* Trip It! Button */}
+        {!collapsed && (
+          <motion.div {...fadeProps}>
+            <button
+              onClick={() => setTripGenerated(true)}
+              className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold text-sm shadow-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
+            >
+              🚀 Trip It!
+            </button>
           </motion.div>
+        )}
+
+        {/* Weather & Packing + Cost Estimation — only after Trip It! */}
+        {tripGenerated && (
+          collapsed ? (
+            <>
+              <CollapsedIcon icon={<Shirt className="w-4 h-4" />} label="Weather & Packing" />
+              <CollapsedIcon icon={<Wallet className="w-4 h-4" />} label="Cost Estimation" />
+            </>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col gap-3"
+            >
+              <WeatherPackingCard />
+              <CostEstimationCard />
+            </motion.div>
+          )
         )}
       </TooltipProvider>
     </motion.aside>
