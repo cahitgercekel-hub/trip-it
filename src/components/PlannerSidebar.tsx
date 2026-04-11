@@ -2,13 +2,16 @@ import { usePlanner } from '@/context/PlannerContext';
 import { useWeather } from '@/hooks/useWeather';
 import { motion } from 'framer-motion';
 import {
-  MapPin, Wallet, Footprints, Route, Train, Ticket, GraduationCap,
+  Footprints, Train, Ticket, GraduationCap,
   Wind, CloudRain, ChevronLeft, ChevronRight, CalendarDays, Search,
+  Wallet, Shirt,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HeadingToCard } from '@/components/sidebar/HeadingToCard';
 import { DatesCard } from '@/components/sidebar/DatesCard';
+import { WeatherPackingCard } from '@/components/sidebar/WeatherPackingCard';
+import { CostEstimationCard } from '@/components/sidebar/CostEstimationCard';
 
 const STORAGE_KEY = 'tageplan_sidebar_collapsed';
 
@@ -24,7 +27,7 @@ export function PlannerSidebar() {
   const {
     country, stepGoal, setStepGoal, budget, setBudget,
     dTicketMode, setDTicketMode, freeOnly, setFreeOnly,
-    isicActive, setIsicActive, stats, selectedCity,
+    isicActive, setIsicActive, selectedCity,
   } = usePlanner();
 
   const { weather, loading, error } = useWeather(selectedCity.center[0], selectedCity.center[1]);
@@ -132,13 +135,16 @@ export function PlannerSidebar() {
           </SidebarCard>
         )}
 
-        {/* Stats */}
-        {!collapsed && (
-          <motion.div {...fadeProps} className="grid grid-cols-2 gap-2">
-            <StatCard icon={<MapPin className="w-4 h-4 text-primary" />} label="POIs" value={stats.poiCount.toString()} />
-            <StatCard icon={<Wallet className="w-4 h-4 text-action" />} label="Cost" value={`€${stats.cost}`} />
-            <StatCard icon={<Footprints className="w-4 h-4 text-nature" />} label="Steps" value={stats.steps.toLocaleString()} />
-            <StatCard icon={<Route className="w-4 h-4 text-culture" />} label="Distance" value={`${stats.distance.toFixed(1)}km`} />
+        {/* Weather & Packing + Cost Estimation */}
+        {collapsed ? (
+          <>
+            <CollapsedIcon icon={<Shirt className="w-4 h-4" />} label="Weather & Packing" />
+            <CollapsedIcon icon={<Wallet className="w-4 h-4" />} label="Cost Estimation" />
+          </>
+        ) : (
+          <motion.div {...fadeProps} className="flex flex-col gap-3">
+            <WeatherPackingCard />
+            <CostEstimationCard />
           </motion.div>
         )}
       </TooltipProvider>
@@ -263,14 +269,5 @@ function ToggleRow({ icon, label, checked, onChange, disabled }: {
         <span className={`absolute top-[3px] w-4 h-4 rounded-full shadow-sm transition-transform ${checked ? 'left-[18px] bg-primary-foreground' : 'left-[3px] bg-card'}`} />
       </button>
     </label>
-  );
-}
-
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="bg-card border border-border rounded-lg p-3 shadow-card flex flex-col gap-1">
-      <div className="flex items-center gap-1.5">{icon}<span className="text-[11px] text-muted-foreground font-medium">{label}</span></div>
-      <span className="text-lg font-bold text-foreground">{value}</span>
-    </div>
   );
 }
