@@ -99,10 +99,11 @@ export function TimelinePanel() {
         <div className="prose prose-sm prose-invert max-w-none">
           <div className="text-xs text-foreground leading-relaxed whitespace-pre-wrap [&_strong]:font-bold [&_em]:italic">
             {aiItinerary.split('\n').map((line, i) => {
-              // Bold lines (markdown **text** or *text*)
+              const boldRe = new RegExp('\\*\\*(.+?)\\*\\*', 'g');
+              const italicRe = new RegExp('\\*(.+?)\\*', 'g');
               const formatted = line
-                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.+?)\*/g, '<em>$1</em>');
+                .replace(boldRe, '<strong>$1</strong>')
+                .replace(italicRe, '<em>$1</em>');
               return (
                 <p
                   key={i}
