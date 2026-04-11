@@ -5,7 +5,7 @@ import { TimelinePanel } from '@/components/TimelinePanel';
 import { MapPanel } from '@/components/MapPanel';
 import { useWeather } from '@/hooks/useWeather';
 import { useState } from 'react';
-import { Menu, X, MapPin } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
 
 function PlannerLayout() {
   const { selectedCity, country, setRainyFilter } = usePlanner();
@@ -31,7 +31,7 @@ function PlannerLayout() {
           </button>
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-              <MapPin className="w-4 h-4 text-primary-foreground" />
+              <Globe className="w-4 h-4 text-primary-foreground" />
             </div>
             <h1 className="text-lg font-bold text-foreground tracking-tight">Tageplan</h1>
           </div>
