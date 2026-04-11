@@ -30,10 +30,11 @@ function formatDuration(mins: number): string {
 
 export function TimelinePanel() {
   const { filteredPois, stepGoal, dTicketMode, isicActive, rainyFilter, setRainyFilter, selectedCity } = usePlanner();
+  const { dayStartMinutes, dayEndMinutes } = usePlanner();
 
   // Build duration-aware timeline
   const entries: TimelineEntry[] = [];
-  let currentMinutes = 9 * 60; // Start at 09:00
+  let currentMinutes = dayStartMinutes;
 
   filteredPois.forEach((poi, i) => {
     const visit = getVisitMinutes(poi);
