@@ -33,7 +33,7 @@ function PlannerLayout() {
             <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
               <Globe className="w-4 h-4 text-primary-foreground" />
             </div>
-            <h1 className="text-lg font-bold text-foreground tracking-tight">Tageplan</h1>
+            <h1 className="text-lg font-bold text-foreground tracking-tight">Trip It!</h1>
           </div>
           <div className="hidden sm:flex items-center gap-1.5 text-sm text-muted-foreground bg-secondary px-3 py-1 rounded-full">
             <span>{flag}</span>
