@@ -11,7 +11,7 @@ interface PlannerState {
   freeOnly: boolean;
   isicActive: boolean;
   rainyFilter: boolean;
-  mapFilter: 'All' | 'Culture' | 'Nature';
+  tripInterests: string[];
 }
 
 interface PlannerContextType extends PlannerState {
@@ -23,7 +23,7 @@ interface PlannerContextType extends PlannerState {
   setFreeOnly: (b: boolean) => void;
   setIsicActive: (b: boolean) => void;
   setRainyFilter: (b: boolean) => void;
-  setMapFilter: (f: 'All' | 'Culture' | 'Nature') => void;
+  toggleTripInterest: (id: string) => void;
   cities: City[];
   selectedCity: City;
   filteredPois: POI[];
@@ -47,7 +47,13 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const [freeOnly, setFreeOnly] = useState(false);
   const [isicActive, setIsicActive] = useState(false);
   const [rainyFilter, setRainyFilter] = useState(false);
-  const [mapFilter, setMapFilter] = useState<'All' | 'Culture' | 'Nature'>('All');
+  const [tripInterests, setTripInterests] = useState<string[]>(['culture', 'nature']);
+
+  const toggleTripInterest = (id: string) => {
+    setTripInterests(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
 
   const setCountry = (c: 'DE' | 'AT') => {
     setCountryRaw(c);
@@ -75,10 +81,14 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       return price <= budget;
     });
 
-    if (mapFilter !== 'All') pois = pois.filter(p => p.category === mapFilter);
+    // Filter by trip interests — map POI categories to interest ids
+    if (tripInterests.length > 0) {
+      const categoryMap: Record<string, string> = { Culture: 'culture', Nature: 'nature' };
+      pois = pois.filter(p => tripInterests.includes(categoryMap[p.category] || ''));
+    }
 
     return pois;
-  }, [selectedCity, rainyFilter, freeOnly, dTicketMode, country, budget, isicActive, mapFilter]);
+  }, [selectedCity, rainyFilter, freeOnly, dTicketMode, country, budget, isicActive, tripInterests]);
 
   const stats = useMemo(() => ({
     poiCount: filteredPois.length,
@@ -89,9 +99,9 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
 
   return (
     <PlannerContext.Provider value={{
-      country, cityId, stepGoal, budget, dTicketMode, freeOnly, isicActive, rainyFilter, mapFilter,
+      country, cityId, stepGoal, budget, dTicketMode, freeOnly, isicActive, rainyFilter, tripInterests,
       setCountry, setCityId, setStepGoal, setBudget, setDTicketMode, setFreeOnly, setIsicActive,
-      setRainyFilter, setMapFilter,
+      setRainyFilter, toggleTripInterest,
       cities, selectedCity, filteredPois, stats,
     }}>
       {children}

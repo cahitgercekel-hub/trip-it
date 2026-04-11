@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import {
   Footprints, Train, Ticket, GraduationCap,
   Wind, CloudRain, ChevronLeft, ChevronRight, CalendarDays, Search,
-  Wallet, Shirt,
+  Wallet, Shirt, Compass,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -12,6 +12,7 @@ import { HeadingToCard } from '@/components/sidebar/HeadingToCard';
 import { DatesCard } from '@/components/sidebar/DatesCard';
 import { WeatherPackingCard } from '@/components/sidebar/WeatherPackingCard';
 import { CostEstimationCard } from '@/components/sidebar/CostEstimationCard';
+import { TripInterestsCard } from '@/components/sidebar/TripInterestsCard';
 
 
 const STORAGE_KEY = 'tageplan_sidebar_collapsed';
@@ -81,6 +82,15 @@ export function PlannerSidebar() {
           <motion.div {...fadeProps} className="flex flex-col gap-3">
             <HeadingToCard />
             <DatesCard />
+          </motion.div>
+        )}
+
+        {/* Trip Interests */}
+        {collapsed ? (
+          <CollapsedIcon icon={<Compass className="w-4 h-4" />} label="Trip Interests" />
+        ) : (
+          <motion.div {...fadeProps}>
+            <TripInterestsCard />
           </motion.div>
         )}
 
