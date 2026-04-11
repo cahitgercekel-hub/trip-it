@@ -87,6 +87,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const [loadingStep, setLoadingStep] = useState(0);
   const [dayStartTime, setDayStartTimeRaw] = useState(() => getStoredTime('tageplan_start_time', '09:00'));
   const [dayEndTime, setDayEndTimeRaw] = useState(() => getStoredTime('tageplan_end_time', '21:00'));
+  const [aiItinerary, setAiItinerary] = useState<string | null>(null);
 
   const setDayStartTime = (t: string) => {
     setDayStartTimeRaw(t);
