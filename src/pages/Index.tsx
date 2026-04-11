@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { PlannerProvider, usePlanner } from '@/context/PlannerContext';
 import { PlannerSidebar } from '@/components/PlannerSidebar';
+import { FloatingPanel } from '@/components/FloatingPanel';
 import { TimelinePanel } from '@/components/TimelinePanel';
 import { MapPanel } from '@/components/MapPanel';
 import { useWeather } from '@/hooks/useWeather';
@@ -45,15 +46,14 @@ function PlannerLayout() {
 
       {/* Main */}
       <div className="flex flex-1 overflow-hidden relative">
-        {/* Desktop sidebar */}
-        <div className="hidden lg:flex">
-          <PlannerSidebar />
+        {/* Desktop: floating panel + full-width timeline & map */}
+        <div className="hidden lg:block">
+          <FloatingPanel>
+            <PlannerSidebar />
+          </FloatingPanel>
         </div>
 
-        <div className="hidden lg:flex">
-          <TimelinePanel />
-        </div>
-
+        <TimelinePanel />
         <MapPanel />
 
         {/* Mobile hamburger FAB */}
@@ -80,7 +80,7 @@ function PlannerLayout() {
                 animate={{ x: 0 }}
                 exit={{ x: -280 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                className="lg:hidden fixed inset-y-0 left-0 z-40"
+                className="lg:hidden fixed inset-y-0 left-0 z-40 w-[280px] bg-card overflow-y-auto border-r border-border"
               >
                 <PlannerSidebar />
               </motion.div>
