@@ -43,8 +43,10 @@ function PlannerLayout() {
       {/* Main */}
       <div className="flex flex-1 overflow-hidden relative">
         {/* Desktop sidebar */}
-        <div className="hidden lg:flex w-[280px] shrink-0 h-full overflow-y-auto border-r border-border bg-card relative z-40">
-          <PlannerSidebar />
+        <div className="hidden lg:flex w-[280px] shrink-0 h-full border-r border-border bg-card relative z-50">
+          <div className="w-full h-full overflow-y-auto">
+            <PlannerSidebar />
+          </div>
         </div>
 
         {/* Itinerary panel — only after generation */}
