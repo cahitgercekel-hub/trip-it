@@ -18,13 +18,14 @@ export interface City {
   country: 'DE' | 'AT';
   center: [number, number];
   zoom: number;
+  airportIATA: string;
   pois: POI[];
 }
 
 export const CITIES_DATA: City[] = [
   // ── GERMANY ──
   {
-    id: 'berlin', name: 'Berlin', country: 'DE', center: [52.52, 13.405], zoom: 12,
+    id: 'berlin', name: 'Berlin', country: 'DE', center: [52.52, 13.405], zoom: 12, airportIATA: 'BER',
     pois: [
       { id: 'ber1', name: 'Brandenburg Gate', lat: 52.5163, lng: 13.3777, category: 'Culture', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 2000, country: 'DE' },
       { id: 'ber2', name: 'Museum Island', lat: 52.5169, lng: 13.4019, category: 'Culture', isFree: false, price: 19, hasISIC: true, dTicket: true, estimatedSteps: 5000, country: 'DE' },
@@ -37,7 +38,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'munich', name: 'Munich', country: 'DE', center: [48.1351, 11.582], zoom: 13,
+    id: 'munich', name: 'Munich', country: 'DE', center: [48.1351, 11.582], zoom: 13, airportIATA: 'MUC',
     pois: [
       { id: 'muc1', name: 'Marienplatz', lat: 48.1374, lng: 11.5755, category: 'Culture', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 2000, country: 'DE' },
       { id: 'muc2', name: 'Englischer Garten', lat: 48.1642, lng: 11.6054, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 10000, country: 'DE' },
@@ -50,7 +51,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'hamburg', name: 'Hamburg', country: 'DE', center: [53.5511, 9.9937], zoom: 12,
+    id: 'hamburg', name: 'Hamburg', country: 'DE', center: [53.5511, 9.9937], zoom: 12, airportIATA: 'HAM',
     pois: [
       { id: 'ham1', name: 'Elbphilharmonie Plaza', lat: 53.5413, lng: 9.9842, category: 'Culture', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 2000, country: 'DE' },
       { id: 'ham2', name: 'Planten un Blomen', lat: 53.5614, lng: 9.9812, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 5000, country: 'DE' },
@@ -63,7 +64,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'cologne', name: 'Cologne', country: 'DE', center: [50.9375, 6.9603], zoom: 13,
+    id: 'cologne', name: 'Cologne', country: 'DE', center: [50.9375, 6.9603], zoom: 13, airportIATA: 'CGN',
     pois: [
       { id: 'col1', name: 'Cologne Cathedral', lat: 50.9413, lng: 6.9583, category: 'Culture', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 2000, country: 'DE' },
       { id: 'col2', name: 'Rheinpark', lat: 50.9433, lng: 6.9783, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 5000, country: 'DE' },
@@ -76,7 +77,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'frankfurt', name: 'Frankfurt', country: 'DE', center: [50.1109, 8.6821], zoom: 13,
+    id: 'frankfurt', name: 'Frankfurt', country: 'DE', center: [50.1109, 8.6821], zoom: 13, airportIATA: 'FRA',
     pois: [
       { id: 'fra1', name: 'Römerberg', lat: 50.1106, lng: 8.6821, category: 'Culture', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 2000, country: 'DE' },
       { id: 'fra2', name: 'Palmengarten', lat: 50.1233, lng: 8.6567, category: 'Nature', isFree: false, price: 7, hasISIC: true, dTicket: true, estimatedSteps: 5000, country: 'DE' },
@@ -89,7 +90,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'stuttgart', name: 'Stuttgart', country: 'DE', center: [48.7758, 9.1829], zoom: 13,
+    id: 'stuttgart', name: 'Stuttgart', country: 'DE', center: [48.7758, 9.1829], zoom: 13, airportIATA: 'STR',
     pois: [
       { id: 'stu1', name: 'Schlossplatz', lat: 48.7784, lng: 9.1800, category: 'Culture', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 2000, country: 'DE' },
       { id: 'stu2', name: 'Killesbergpark', lat: 48.8015, lng: 9.1715, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 5000, country: 'DE' },
@@ -102,7 +103,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'dusseldorf', name: 'Düsseldorf', country: 'DE', center: [51.2277, 6.7735], zoom: 13,
+    id: 'dusseldorf', name: 'Düsseldorf', country: 'DE', center: [51.2277, 6.7735], zoom: 13, airportIATA: 'DUS',
     pois: [
       { id: 'dus1', name: 'Altstadt (Old Town)', lat: 51.2263, lng: 6.7724, category: 'Culture', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 3000, country: 'DE' },
       { id: 'dus2', name: 'Hofgarten', lat: 51.2320, lng: 6.7835, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 4000, country: 'DE' },
@@ -115,7 +116,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'leipzig', name: 'Leipzig', country: 'DE', center: [51.3397, 12.3731], zoom: 13,
+    id: 'leipzig', name: 'Leipzig', country: 'DE', center: [51.3397, 12.3731], zoom: 13, airportIATA: 'LEJ',
     pois: [
       { id: 'lei1', name: 'Monument to the Battle of the Nations', lat: 51.3127, lng: 12.4132, category: 'Culture', isFree: false, price: 10, hasISIC: true, dTicket: true, estimatedSteps: 3000, country: 'DE' },
       { id: 'lei2', name: 'Clara-Zetkin-Park', lat: 51.3290, lng: 12.3550, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 5000, country: 'DE' },
@@ -128,7 +129,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'nuremberg', name: 'Nuremberg', country: 'DE', center: [49.4521, 11.0767], zoom: 13,
+    id: 'nuremberg', name: 'Nuremberg', country: 'DE', center: [49.4521, 11.0767], zoom: 13, airportIATA: 'NUE',
     pois: [
       { id: 'nur1', name: 'Imperial Castle', lat: 49.4579, lng: 11.0757, category: 'Culture', isFree: false, price: 7, hasISIC: true, dTicket: true, estimatedSteps: 3000, country: 'DE' },
       { id: 'nur2', name: 'Stadtpark', lat: 49.4500, lng: 11.1000, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 4000, country: 'DE' },
@@ -141,7 +142,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'dresden', name: 'Dresden', country: 'DE', center: [51.0504, 13.7373], zoom: 13,
+    id: 'dresden', name: 'Dresden', country: 'DE', center: [51.0504, 13.7373], zoom: 13, airportIATA: 'DRS',
     pois: [
       { id: 'dre1', name: 'Frauenkirche', lat: 51.0519, lng: 13.7413, category: 'Culture', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 1500, country: 'DE' },
       { id: 'dre2', name: 'Großer Garten', lat: 51.0393, lng: 13.7620, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 6000, country: 'DE' },
@@ -154,7 +155,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'heidelberg', name: 'Heidelberg', country: 'DE', center: [49.3988, 8.6724], zoom: 14,
+    id: 'heidelberg', name: 'Heidelberg', country: 'DE', center: [49.3988, 8.6724], zoom: 14, airportIATA: 'FRA',
     pois: [
       { id: 'hei1', name: 'Heidelberg Castle', lat: 49.4106, lng: 8.7153, category: 'Culture', isFree: false, price: 9, hasISIC: true, dTicket: true, estimatedSteps: 4000, country: 'DE' },
       { id: 'hei2', name: 'Philosopher\'s Walk', lat: 49.4135, lng: 8.7050, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 5000, country: 'DE' },
@@ -167,7 +168,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'freiburg', name: 'Freiburg', country: 'DE', center: [47.999, 7.842], zoom: 13,
+    id: 'freiburg', name: 'Freiburg', country: 'DE', center: [47.999, 7.842], zoom: 13, airportIATA: 'BSL',
     pois: [
       { id: 'fre1', name: 'Freiburg Minster', lat: 47.9957, lng: 7.8529, category: 'Culture', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 1500, country: 'DE' },
       { id: 'fre2', name: 'Schlossberg', lat: 47.9955, lng: 7.8610, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: true, estimatedSteps: 5000, country: 'DE' },
@@ -181,7 +182,7 @@ export const CITIES_DATA: City[] = [
   },
   // ── AUSTRIA ──
   {
-    id: 'vienna', name: 'Vienna', country: 'AT', center: [48.2082, 16.3738], zoom: 13,
+    id: 'vienna', name: 'Vienna', country: 'AT', center: [48.2082, 16.3738], zoom: 13, airportIATA: 'VIE',
     pois: [
       { id: 'vie1', name: 'Schönbrunn Palace', lat: 48.1845, lng: 16.3122, category: 'Culture', isFree: false, price: 22, hasISIC: true, dTicket: false, estimatedSteps: 5000, country: 'AT' },
       { id: 'vie2', name: 'Prater Park', lat: 48.2165, lng: 16.3958, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: false, estimatedSteps: 6000, country: 'AT' },
@@ -194,7 +195,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'salzburg', name: 'Salzburg', country: 'AT', center: [47.8095, 13.055], zoom: 14,
+    id: 'salzburg', name: 'Salzburg', country: 'AT', center: [47.8095, 13.055], zoom: 14, airportIATA: 'SZG',
     pois: [
       { id: 'sal1', name: 'Hohensalzburg Fortress', lat: 47.7953, lng: 13.0476, category: 'Culture', isFree: false, price: 13, hasISIC: true, dTicket: false, estimatedSteps: 4000, country: 'AT' },
       { id: 'sal2', name: 'Mirabell Gardens', lat: 47.8049, lng: 13.0418, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: false, estimatedSteps: 2000, country: 'AT' },
@@ -207,7 +208,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'graz', name: 'Graz', country: 'AT', center: [47.0707, 15.4395], zoom: 14,
+    id: 'graz', name: 'Graz', country: 'AT', center: [47.0707, 15.4395], zoom: 14, airportIATA: 'GRZ',
     pois: [
       { id: 'gra1', name: 'Schlossberg', lat: 47.0764, lng: 15.4374, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: false, estimatedSteps: 4000, country: 'AT' },
       { id: 'gra2', name: 'Kunsthaus Graz', lat: 47.0716, lng: 15.4342, category: 'Culture', isFree: false, price: 11, hasISIC: true, dTicket: false, estimatedSteps: 2000, country: 'AT' },
@@ -220,7 +221,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'innsbruck', name: 'Innsbruck', country: 'AT', center: [47.2692, 11.4041], zoom: 14,
+    id: 'innsbruck', name: 'Innsbruck', country: 'AT', center: [47.2692, 11.4041], zoom: 14, airportIATA: 'INN',
     pois: [
       { id: 'inn1', name: 'Golden Roof', lat: 47.2685, lng: 11.3932, category: 'Culture', isFree: true, price: 0, hasISIC: false, dTicket: false, estimatedSteps: 1000, country: 'AT' },
       { id: 'inn2', name: 'Nordkette Cable Car', lat: 47.3117, lng: 11.3880, category: 'Nature', isFree: false, price: 39, hasISIC: true, dTicket: false, estimatedSteps: 3000, country: 'AT' },
@@ -233,7 +234,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'linz', name: 'Linz', country: 'AT', center: [48.3069, 14.2858], zoom: 13,
+    id: 'linz', name: 'Linz', country: 'AT', center: [48.3069, 14.2858], zoom: 13, airportIATA: 'LNZ',
     pois: [
       { id: 'lin1', name: 'Ars Electronica Center', lat: 48.3095, lng: 14.2842, category: 'Culture', isFree: false, price: 12, hasISIC: true, dTicket: false, estimatedSteps: 3000, country: 'AT' },
       { id: 'lin2', name: 'Donaupark', lat: 48.3130, lng: 14.2900, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: false, estimatedSteps: 4000, country: 'AT' },
@@ -246,7 +247,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'bregenz', name: 'Bregenz', country: 'AT', center: [47.5031, 9.7471], zoom: 14,
+    id: 'bregenz', name: 'Bregenz', country: 'AT', center: [47.5031, 9.7471], zoom: 14, airportIATA: 'FDH',
     pois: [
       { id: 'bre1', name: 'Pfänder Mountain', lat: 47.5090, lng: 9.7880, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: false, estimatedSteps: 6000, country: 'AT' },
       { id: 'bre2', name: 'Kunsthaus Bregenz', lat: 47.5031, lng: 9.7456, category: 'Culture', isFree: false, price: 12, hasISIC: true, dTicket: false, estimatedSteps: 2000, country: 'AT' },
@@ -259,7 +260,7 @@ export const CITIES_DATA: City[] = [
     ],
   },
   {
-    id: 'klagenfurt', name: 'Klagenfurt', country: 'AT', center: [46.6247, 14.3053], zoom: 13,
+    id: 'klagenfurt', name: 'Klagenfurt', country: 'AT', center: [46.6247, 14.3053], zoom: 13, airportIATA: 'KLU',
     pois: [
       { id: 'kla1', name: 'Minimundus', lat: 46.6180, lng: 14.2635, category: 'Culture', isFree: false, price: 19, hasISIC: true, dTicket: false, estimatedSteps: 3000, country: 'AT' },
       { id: 'kla2', name: 'Europapark', lat: 46.6210, lng: 14.2680, category: 'Nature', isFree: true, price: 0, hasISIC: false, dTicket: false, estimatedSteps: 4000, country: 'AT' },
