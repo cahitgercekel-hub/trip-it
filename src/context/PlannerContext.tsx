@@ -22,6 +22,7 @@ interface PlannerState {
   loadingStep: number;
   dayStartTime: string;
   dayEndTime: string;
+  aiItinerary: string | null;
 }
 
 const LOADING_STEPS = [
