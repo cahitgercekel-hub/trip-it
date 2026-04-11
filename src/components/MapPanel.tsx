@@ -35,25 +35,6 @@ export function MapPanel() {
     <div className="flex-1 h-screen relative">
       {/* Top bar */}
       <div className="absolute top-3 left-3 right-3 z-[1000] flex flex-col gap-2">
-        <div className="flex items-center justify-between gap-3">
-          {/* City tabs */}
-          <div className="flex items-center gap-0.5 bg-card/95 backdrop-blur-sm border border-border rounded-lg px-1.5 py-1 overflow-x-auto max-w-[65%] shadow-card">
-            {cities.map(c => (
-              <button
-                key={c.id}
-                onClick={() => setCityId(c.id)}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all ${
-                  c.id === cityId
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-                }`}
-              >
-                {c.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Trip interests bar */}
         <TripInterestsBar />
       </div>
