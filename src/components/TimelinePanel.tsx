@@ -136,20 +136,23 @@ export function TimelinePanel() {
         </div>
       </motion.div>
 
-      {/* Collapsed vertical tab */}
+      {/* Floating re-open tab — collapsed state */}
       {collapsed && (
-        <button
+        <motion.button
+          initial={{ opacity: 0, x: -6 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.15 }}
           onClick={() => setCollapsed(false)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-card border border-border rounded-r-md px-1.5 py-4 cursor-pointer hover:border-primary/40 transition-colors flex items-center"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-50 bg-card border border-border border-l-2 border-l-primary rounded-r-lg px-1.5 py-5 flex flex-col items-center gap-2 cursor-pointer hover:bg-secondary hover:border-primary/30 hover:scale-[1.03] transition-all"
         >
-          <PanelLeftOpen className="w-3.5 h-3.5 text-muted-foreground mb-1" />
+          <ChevronRight className="w-3.5 h-3.5 text-primary" />
           <span
             className="text-[10px] text-muted-foreground font-medium tracking-wider"
             style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
           >
             Itinerary
           </span>
-        </button>
+        </motion.button>
       )}
     </div>
   );
