@@ -2,7 +2,7 @@ import { usePlanner } from '@/context/PlannerContext';
 import { haversine, getTransportRecommendation, type TransportRecommendation } from '@/lib/planner';
 import { useWeather } from '@/hooks/useWeather';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Landmark, TreePine, Droplets, TrainFront, Ticket, X, PanelLeftClose, ChevronRight, Footprints, Car, Info, Wind, CloudRain } from 'lucide-react';
+import { Landmark, TreePine, Droplets, TrainFront, Ticket, X, PanelLeftClose, ChevronRight, Footprints, Car, Info, Wind, CloudRain, Clock } from 'lucide-react';
 import type { POI } from '@/data/cities';
 import { useState, useEffect } from 'react';
 
@@ -233,26 +233,25 @@ function TransportCard({ transport, dTicketMode }: { transport: TransportRecomme
   const ModeIcon = mode === 'walk' ? Footprints : mode === 'taxi' ? Car : TrainFront;
   const iconBg = mode === 'walk' ? 'bg-nature-light text-nature' : mode === 'taxi' ? 'bg-warning-light text-warning' : 'bg-primary/10 text-primary';
 
-  // Build time breakdown string
-  let breakdown = '';
-  if (mode === 'walk') {
-    breakdown = `${totalMinutes} min walk`;
-  } else if (mode === 'transit') {
-    const parts: string[] = [];
-    if (walkMinutes > 0) parts.push(`${walkMinutes} min walk`);
-    if (waitMinutes > 0) parts.push(`${waitMinutes} min wait`);
-    if (rideMinutes > 0) parts.push(`${rideMinutes} min ${transitType}`);
-    breakdown = parts.join(' + ');
-  } else if (mode === 'taxi') {
-    const parts: string[] = [];
-    if (waitMinutes > 0) parts.push(`${waitMinutes} min pickup`);
-    if (rideMinutes > 0) parts.push(`${rideMinutes} min ride`);
-    breakdown = parts.join(' + ');
-  }
-
   const timeLabel = mode === 'walk'
     ? `${totalMinutes} min walk`
     : `${totalMinutes} min total`;
+
+  const distLabel = distanceKm < 1 ? `${Math.round(distanceKm * 1000)} m` : `${distanceKm.toFixed(1)} km`;
+
+  // Build segment chips
+  const segments: { icon: React.ElementType; text: string; style: string }[] = [];
+
+  if (mode === 'walk') {
+    segments.push({ icon: Footprints, text: `${totalMinutes} min walk`, style: 'bg-nature-light text-nature' });
+  } else if (mode === 'transit') {
+    if (walkMinutes > 0) segments.push({ icon: Footprints, text: `${walkMinutes} min walk`, style: 'bg-nature-light text-nature' });
+    if (waitMinutes > 0) segments.push({ icon: Clock, text: `${waitMinutes} min wait`, style: 'bg-warning-light text-warning' });
+    if (rideMinutes > 0) segments.push({ icon: TrainFront, text: `${rideMinutes} min ${transitType}`, style: 'bg-primary/10 text-primary' });
+  } else if (mode === 'taxi') {
+    if (waitMinutes > 0) segments.push({ icon: Clock, text: `${waitMinutes} min pickup`, style: 'bg-warning-light text-warning' });
+    if (rideMinutes > 0) segments.push({ icon: Car, text: `${rideMinutes} min taxi`, style: 'bg-secondary text-muted-foreground' });
+  }
 
   return (
     <div className="flex items-start gap-2.5">
@@ -262,12 +261,19 @@ function TransportCard({ transport, dTicketMode }: { transport: TransportRecomme
       <div className="flex-1 min-w-0">
         <p className="text-xs font-semibold text-foreground">{label}</p>
         <p className="text-[12px] font-bold text-foreground mt-0.5">
-          {timeLabel} · {distanceKm.toFixed(1)} km
+          {timeLabel} · {distLabel}
         </p>
-        {mode !== 'walk' && breakdown && (
-          <p className="text-[11px] text-muted-foreground mt-0.5">{breakdown}</p>
-        )}
-        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+        {/* Segment chips */}
+        <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+          {segments.map((seg, idx) => (
+            <span key={idx} className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-md ${seg.style}`}>
+              <seg.icon className="w-3 h-3" />
+              {seg.text}
+            </span>
+          ))}
+        </div>
+        {/* Tags row */}
+        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
           {dTicketMode && mode === 'transit' && (
             <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">D-Ticket ✓</span>
           )}
