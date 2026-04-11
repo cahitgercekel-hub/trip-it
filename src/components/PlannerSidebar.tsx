@@ -22,9 +22,7 @@ function getInitialCollapsed(): boolean {
 
 export function PlannerSidebar() {
   const {
-    country,
-    stepGoal, setStepGoal, budget, setBudget,
-    stepGoal, setStepGoal, budget, setBudget,
+    country, stepGoal, setStepGoal, budget, setBudget,
     dTicketMode, setDTicketMode, freeOnly, setFreeOnly,
     isicActive, setIsicActive, stats, selectedCity,
   } = usePlanner();
