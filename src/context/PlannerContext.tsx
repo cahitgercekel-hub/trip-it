@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useMemo, useCallback, useRef } from 'react';
+import { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
 import { CITIES_DATA, City, POI } from '@/data/cities';
 import { buildItineraryRequest, generateItinerary } from '@/lib/api';
 import { getTotalDistance, getTotalSteps, getEstimatedCost } from '@/lib/planner';
@@ -47,6 +47,7 @@ interface PlannerContextType extends PlannerState {
   toggleTripInterest: (id: string) => void;
   setTripGenerated: (b: boolean) => void;
   generateTrip: () => void;
+  aiItinerary: string | null;
   setDayStartTime: (t: string) => void;
   setDayEndTime: (t: string) => void;
   dayStartMinutes: number;
