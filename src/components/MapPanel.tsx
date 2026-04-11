@@ -39,20 +39,6 @@ export function MapPanel() {
         <TripInterestsBar />
       </div>
 
-      {/* Legend */}
-      <div className="absolute bottom-6 left-3 z-[1000] bg-card/95 backdrop-blur-sm border border-border rounded-lg px-3 py-2.5 shadow-card">
-        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Legend</p>
-        <div className="flex flex-col gap-1.5 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-culture flex items-center justify-center text-[10px]">🏛️</div>
-            <span className="text-foreground font-medium">Culture</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-nature flex items-center justify-center text-[10px]">🌿</div>
-            <span className="text-foreground font-medium">Nature</span>
-          </div>
-        </div>
-      </div>
 
       <MapContainer
         center={selectedCity.center}
