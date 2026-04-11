@@ -12,6 +12,7 @@ interface PlannerState {
   isicActive: boolean;
   rainyFilter: boolean;
   tripInterests: string[];
+  tripGenerated: boolean;
 }
 
 interface PlannerContextType extends PlannerState {
@@ -24,6 +25,7 @@ interface PlannerContextType extends PlannerState {
   setIsicActive: (b: boolean) => void;
   setRainyFilter: (b: boolean) => void;
   toggleTripInterest: (id: string) => void;
+  setTripGenerated: (b: boolean) => void;
   cities: City[];
   selectedCity: City;
   filteredPois: POI[];
@@ -100,9 +102,9 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
 
   return (
     <PlannerContext.Provider value={{
-      country, cityId, stepGoal, budget, dTicketMode, freeOnly, isicActive, rainyFilter, tripInterests,
+      country, cityId, stepGoal, budget, dTicketMode, freeOnly, isicActive, rainyFilter, tripInterests, tripGenerated,
       setCountry, setCityId, setStepGoal, setBudget, setDTicketMode, setFreeOnly, setIsicActive,
-      setRainyFilter, toggleTripInterest,
+      setRainyFilter, toggleTripInterest, setTripGenerated,
       cities, selectedCity, filteredPois, stats,
     }}>
       {children}
