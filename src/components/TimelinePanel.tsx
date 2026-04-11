@@ -89,7 +89,6 @@ export function TimelinePanel() {
                   <span className="flex items-center gap-1"><CloudRain className="w-2.5 h-2.5" /> {weather.precipitation} mm</span>
                 </div>
               </div>
-              </div>
             ) : null}
           </div>
 
