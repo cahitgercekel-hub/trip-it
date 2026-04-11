@@ -3,30 +3,67 @@ import { haversine, getTransportRecommendation, type TransportRecommendation } f
 import { motion, AnimatePresence } from 'framer-motion';
 import { Landmark, TreePine, TrainFront, Ticket, X, Footprints, Car, Info, Clock } from 'lucide-react';
 import type { POI } from '@/data/cities';
+import { getVisitMinutes } from '@/data/cities';
 
 interface TimelineEntry {
-  type: 'poi' | 'refill' | 'transport';
+  type: 'poi' | 'transport';
   poi?: POI;
-  time: string;
+  startTime: string;     // HH:MM
+  endTime?: string;       // HH:MM (for POI entries)
+  visitMinutes?: number;
   transport?: TransportRecommendation;
+}
+
+function minutesToTime(totalMinutes: number): string {
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+function formatDuration(mins: number): string {
+  if (mins < 60) return `${mins} min`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (m === 0) return `${h} hr`;
+  return `${h} hr ${m} min`;
 }
 
 export function TimelinePanel() {
   const { filteredPois, stepGoal, dTicketMode, isicActive, rainyFilter, setRainyFilter, selectedCity } = usePlanner();
 
+  // Build duration-aware timeline
   const entries: TimelineEntry[] = [];
-  let hour = 9;
+  let currentMinutes = 9 * 60; // Start at 09:00
 
   filteredPois.forEach((poi, i) => {
-    entries.push({ type: 'poi', poi, time: `${String(hour).padStart(2, '0')}:00` });
-    hour++;
+    const visit = getVisitMinutes(poi);
+    const startTime = minutesToTime(currentMinutes);
+    const endMinutes = currentMinutes + visit;
+    const endTime = minutesToTime(endMinutes);
+
+    entries.push({
+      type: 'poi',
+      poi,
+      startTime,
+      endTime,
+      visitMinutes: visit,
+    });
+
+    currentMinutes = endMinutes;
 
     if (i < filteredPois.length - 1) {
       const next = filteredPois[i + 1];
       const dist = haversine(poi.lat, poi.lng, next.lat, next.lng);
       const transport = getTransportRecommendation(dist, stepGoal, dTicketMode);
-      entries.push({ type: 'transport', time: `${String(hour).padStart(2, '0')}:00`, transport });
-      hour++;
+      const transitStart = minutesToTime(currentMinutes);
+
+      entries.push({
+        type: 'transport',
+        startTime: transitStart,
+        transport,
+      });
+
+      currentMinutes += transport.totalMinutes;
     }
   });
 
@@ -34,13 +71,15 @@ export function TimelinePanel() {
     <div className="w-[340px] h-full overflow-y-auto p-5 bg-background border-r border-border">
       <div className="mb-5">
         <h2 className="text-base font-bold text-foreground">Your Itinerary</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">{filteredPois.length} stops · Starting at 09:00</p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {filteredPois.length} stops · {minutesToTime(9 * 60)} – {minutesToTime(currentMinutes)}
+        </p>
       </div>
 
       <div className="mb-4 flex items-start gap-2 bg-secondary/50 border border-border/50 rounded-lg px-3 py-2">
         <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
         <p className="text-[10px] text-muted-foreground leading-relaxed">
-          Transport recommendations adapt to your walking goal ({stepGoal.toLocaleString()} steps).
+          Times are estimated based on visit duration and travel time.
         </p>
       </div>
 
@@ -82,12 +121,20 @@ export function TimelinePanel() {
             className="flex gap-3"
           >
             <div className="flex flex-col items-center w-12 shrink-0">
-              <span className="text-[11px] text-muted-foreground font-mono font-medium">{entry.time}</span>
+              <span className="text-[11px] text-muted-foreground font-mono font-medium">{entry.startTime}</span>
               <div className={`w-2.5 h-2.5 rounded-full mt-1.5 ring-2 ring-offset-2 ring-offset-background ${getDotStyle(entry)}`} />
               {i < entries.length - 1 && <div className="w-px flex-1 bg-border min-h-[20px]" />}
             </div>
             <div className={`flex-1 mb-3 rounded-lg border p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover ${getCardStyle(entry)}`}>
-              {entry.type === 'poi' && entry.poi && <POICard poi={entry.poi} isicActive={isicActive} />}
+              {entry.type === 'poi' && entry.poi && (
+                <POICard
+                  poi={entry.poi}
+                  isicActive={isicActive}
+                  visitMinutes={entry.visitMinutes!}
+                  startTime={entry.startTime}
+                  endTime={entry.endTime!}
+                />
+              )}
               {entry.type === 'transport' && entry.transport && <TransportCard transport={entry.transport} dTicketMode={dTicketMode} />}
             </div>
           </motion.div>
@@ -105,7 +152,13 @@ export function TimelinePanel() {
 }
 
 /* ─── POI Card ─── */
-function POICard({ poi, isicActive }: { poi: POI; isicActive: boolean }) {
+function POICard({ poi, isicActive, visitMinutes, startTime, endTime }: {
+  poi: POI;
+  isicActive: boolean;
+  visitMinutes: number;
+  startTime: string;
+  endTime: string;
+}) {
   const isCulture = poi.category === 'Culture';
   const Icon = isCulture ? Landmark : TreePine;
   const price = isicActive && poi.hasISIC ? Math.round(poi.price * 0.5) : poi.price;
@@ -119,6 +172,16 @@ function POICard({ poi, isicActive }: { poi: POI; isicActive: boolean }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-foreground leading-tight">{poi.name}</p>
+
+        {/* Time & duration row */}
+        <div className="flex items-center gap-2 mt-1">
+          <span className="text-[10px] text-muted-foreground font-mono">{startTime} – {endTime}</span>
+          <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-secondary text-muted-foreground">
+            <Clock className="w-2.5 h-2.5" />
+            {formatDuration(visitMinutes)}
+          </span>
+        </div>
+
         <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
           <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded ${
             isCulture ? 'bg-culture-light text-culture' : 'bg-nature-light text-nature'
