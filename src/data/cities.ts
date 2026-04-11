@@ -12,6 +12,29 @@ export interface POI {
   country: 'DE' | 'AT';
 }
 
+/**
+ * Estimate visit duration in minutes based on steps and category.
+ * Museums/palaces (Culture with high steps or paid entry) → longer visits.
+ * Free landmarks/photo stops → shorter visits.
+ * Nature/parks → moderate based on size.
+ */
+export function getVisitMinutes(poi: POI): number {
+  if (poi.category === 'Culture') {
+    // Paid museums / palaces get longer visits
+    if (!poi.isFree && poi.price >= 10) return Math.max(90, Math.round(poi.estimatedSteps / 40));
+    if (!poi.isFree) return Math.max(60, Math.round(poi.estimatedSteps / 50));
+    // Free landmarks / photo stops
+    if (poi.estimatedSteps <= 1500) return 25;
+    if (poi.estimatedSteps <= 2000) return 35;
+    return Math.max(40, Math.round(poi.estimatedSteps / 60));
+  }
+  // Nature
+  if (poi.estimatedSteps >= 7000) return 90;
+  if (poi.estimatedSteps >= 5000) return 60;
+  if (poi.estimatedSteps >= 3000) return 45;
+  return 30;
+}
+
 export interface City {
   id: string;
   name: string;
