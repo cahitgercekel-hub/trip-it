@@ -64,35 +64,17 @@ export function PlannerSidebar() {
           <WeatherCard cityName={selectedCity.name} weather={weather} loading={loading} error={error} />
         )}
 
-        {/* Country */}
+        {/* Heading To + Dates */}
         {collapsed ? (
-          <CollapsedIcon icon={<Globe className="w-4 h-4" />} label="Country" />
+          <>
+            <CollapsedIcon icon={<Search className="w-4 h-4" />} label="Heading to" />
+            <CollapsedIcon icon={<CalendarDays className="w-4 h-4" />} label="Dates" />
+          </>
         ) : (
-          <SidebarCard title="Country">
-            <motion.div {...fadeProps} className="flex gap-2">
-              <PillButton active={country === 'DE'} onClick={() => setCountry('DE')}>🇩🇪 Germany</PillButton>
-              <PillButton active={country === 'AT'} onClick={() => setCountry('AT')}>🇦🇹 Austria</PillButton>
-            </motion.div>
-          </SidebarCard>
-        )}
-
-        {/* City */}
-        {collapsed ? (
-          <CollapsedIcon icon={<Building2 className="w-4 h-4" />} label="Destination" />
-        ) : (
-          <SidebarCard title="Destination">
-            <motion.div {...fadeProps}>
-              <select
-                value={cityId}
-                onChange={e => setCityId(e.target.value)}
-                className="w-full bg-background text-foreground border border-border rounded-lg px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-              >
-                {cities.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-            </motion.div>
-          </SidebarCard>
+          <motion.div {...fadeProps} className="flex flex-col gap-3">
+            <HeadingToCard />
+            <DatesCard />
+          </motion.div>
         )}
 
         {/* Step Goal */}
