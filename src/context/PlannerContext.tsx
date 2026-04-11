@@ -48,6 +48,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const [isicActive, setIsicActive] = useState(false);
   const [rainyFilter, setRainyFilter] = useState(false);
   const [tripInterests, setTripInterests] = useState<string[]>(['culture', 'nature']);
+  const [tripGenerated, setTripGenerated] = useState(false);
 
   const toggleTripInterest = (id: string) => {
     setTripInterests(prev =>
