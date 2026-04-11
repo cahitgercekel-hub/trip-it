@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
 import { CITIES_DATA, City, POI } from '@/data/cities';
+import { buildItineraryRequest, generateItinerary } from '@/lib/api';
 import { getTotalDistance, getTotalSteps, getEstimatedCost } from '@/lib/planner';
 
 function getStoredTime(key: string, fallback: string): string {
@@ -21,6 +22,7 @@ interface PlannerState {
   loadingStep: number;
   dayStartTime: string;
   dayEndTime: string;
+  aiItinerary: string | null;
 }
 
 const LOADING_STEPS = [
@@ -45,6 +47,7 @@ interface PlannerContextType extends PlannerState {
   toggleTripInterest: (id: string) => void;
   setTripGenerated: (b: boolean) => void;
   generateTrip: () => void;
+  aiItinerary: string | null;
   setDayStartTime: (t: string) => void;
   setDayEndTime: (t: string) => void;
   dayStartMinutes: number;
@@ -84,6 +87,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const [loadingStep, setLoadingStep] = useState(0);
   const [dayStartTime, setDayStartTimeRaw] = useState(() => getStoredTime('tageplan_start_time', '09:00'));
   const [dayEndTime, setDayEndTimeRaw] = useState(() => getStoredTime('tageplan_end_time', '21:00'));
+  const [aiItinerary, setAiItinerary] = useState<string | null>(null);
 
   const setDayStartTime = (t: string) => {
     setDayStartTimeRaw(t);
@@ -125,25 +129,6 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     if (c === 'AT') setDTicketMode(false);
   };
 
-  const generateTrip = useCallback(() => {
-    if (tripLoading) return;
-    setTripLoading(true);
-    setTripGenerated(false);
-    setLoadingStep(0);
-
-    let step = 0;
-    const interval = setInterval(() => {
-      step++;
-      if (step >= LOADING_STEPS.length) {
-        clearInterval(interval);
-        setTripLoading(false);
-        setTripGenerated(true);
-      } else {
-        setLoadingStep(step);
-      }
-    }, 700);
-  }, [tripLoading]);
-
   const cities = useMemo(() => CITIES_DATA.filter(c => c.country === country), [country]);
   const selectedCity = useMemo(() => CITIES_DATA.find(c => c.id === cityId) || CITIES_DATA[0], [cityId]);
 
@@ -170,10 +155,48 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     distance: getTotalDistance(filteredPois),
   }), [filteredPois, isicActive]);
 
+  const generateTrip = useCallback(async () => {
+    if (tripLoading) return;
+    setTripLoading(true);
+    setTripGenerated(false);
+    setAiItinerary(null);
+    setLoadingStep(0);
+
+    let step = 0;
+    const interval = setInterval(() => {
+      step++;
+      if (step < LOADING_STEPS.length - 1) {
+        setLoadingStep(step);
+      }
+    }, 700);
+
+    try {
+      const request = buildItineraryRequest(
+        selectedCity.name,
+        filteredPois,
+        dayStartTime,
+        dayEndTime,
+        tripInterests,
+        stepGoal,
+      );
+      const response = await generateItinerary(request);
+      setAiItinerary(response.itinerary);
+    } catch (err) {
+      console.error('Failed to generate itinerary:', err);
+      setAiItinerary(null);
+    } finally {
+      clearInterval(interval);
+      setLoadingStep(LOADING_STEPS.length - 1);
+      setTripLoading(false);
+      setTripGenerated(true);
+    }
+  }, [tripLoading, selectedCity, filteredPois, dayStartTime, dayEndTime, tripInterests, stepGoal]);
+
   return (
     <PlannerContext.Provider value={{
       country, cityId, stepGoal, budget, dTicketMode, freeOnly, isicActive, rainyFilter, tripInterests, tripGenerated, tripLoading, loadingStep,
       dayStartTime, dayEndTime, dayStartMinutes, dayEndMinutes,
+      aiItinerary,
       setCountry, setCityId, setStepGoal, setBudget, setDTicketMode, setFreeOnly, setIsicActive,
       setRainyFilter, toggleTripInterest, setTripGenerated, generateTrip,
       setDayStartTime, setDayEndTime,
