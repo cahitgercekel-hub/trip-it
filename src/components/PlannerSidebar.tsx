@@ -2,13 +2,16 @@ import { usePlanner } from '@/context/PlannerContext';
 import { useWeather } from '@/hooks/useWeather';
 import { motion } from 'framer-motion';
 import {
-  MapPin, Wallet, Footprints, Route, Train, Ticket, GraduationCap,
+  Train, Ticket, GraduationCap,
   Wind, CloudRain, ChevronLeft, ChevronRight, CalendarDays, Search,
+  Shirt, Wallet,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HeadingToCard } from '@/components/sidebar/HeadingToCard';
 import { DatesCard } from '@/components/sidebar/DatesCard';
+import { WeatherPackingCard } from '@/components/sidebar/WeatherPackingCard';
+import { CostEstimationCard } from '@/components/sidebar/CostEstimationCard';
 
 const STORAGE_KEY = 'tageplan_sidebar_collapsed';
 
