@@ -92,7 +92,7 @@ export function DatesCard() {
         </div>
         <div className="flex gap-2">
           <div className="flex-1 flex flex-col gap-1">
-            <span className="text-[10px] text-muted-foreground font-medium">Start time</span>
+            <span className="text-[10px] text-muted-foreground font-medium">Arrival time</span>
             <input
               type="time"
               value={dayStartTime}
