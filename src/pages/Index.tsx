@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { PlannerProvider, usePlanner } from '@/context/PlannerContext';
 import { PlannerSidebar } from '@/components/PlannerSidebar';
 import { TimelinePanel } from '@/components/TimelinePanel';
 import { MapPanel } from '@/components/MapPanel';
 import { useWeather } from '@/hooks/useWeather';
-import { useState } from 'react';
 import { Menu, X, Globe } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 function PlannerLayout() {
   const { selectedCity, country, setRainyFilter } = usePlanner();
@@ -14,7 +14,6 @@ function PlannerLayout() {
 
   const { weather } = useWeather(selectedCity.center[0], selectedCity.center[1]);
 
-  // Auto-enable rainy filter when weather is rainy
   useEffect(() => {
     if (weather) {
       setRainyFilter(weather.isRainy);
@@ -26,9 +25,6 @@ function PlannerLayout() {
       {/* Header */}
       <header className="h-14 min-h-[56px] flex items-center justify-between px-5 border-b border-border bg-card z-50">
         <div className="flex items-center gap-4">
-          <button className="lg:hidden text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
               <Globe className="w-4 h-4 text-primary-foreground" />
@@ -49,13 +45,9 @@ function PlannerLayout() {
 
       {/* Main */}
       <div className="flex flex-1 overflow-hidden relative">
-        <div className={`
-          ${mobileOpen ? 'absolute inset-0 z-40 bg-foreground/20 backdrop-blur-sm lg:relative lg:bg-transparent' : 'hidden lg:flex'}
-        `}>
+        {/* Desktop sidebar */}
+        <div className="hidden lg:flex">
           <PlannerSidebar />
-          {mobileOpen && (
-            <div className="flex-1 lg:hidden" onClick={() => setMobileOpen(false)} />
-          )}
         </div>
 
         <div className="hidden lg:flex">
@@ -63,6 +55,38 @@ function PlannerLayout() {
         </div>
 
         <MapPanel />
+
+        {/* Mobile hamburger FAB */}
+        <button
+          className="lg:hidden fixed bottom-5 right-5 z-50 bg-primary rounded-full w-12 h-12 shadow-lg flex items-center justify-center text-primary-foreground"
+          onClick={() => setMobileOpen(o => !o)}
+        >
+          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+
+        {/* Mobile overlay sidebar */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="lg:hidden fixed inset-0 z-40 bg-foreground/50"
+                onClick={() => setMobileOpen(false)}
+              />
+              <motion.div
+                initial={{ x: -280 }}
+                animate={{ x: 0 }}
+                exit={{ x: -280 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className="lg:hidden fixed inset-y-0 left-0 z-40"
+              >
+                <PlannerSidebar />
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
