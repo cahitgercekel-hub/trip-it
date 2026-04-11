@@ -1,12 +1,14 @@
 import { usePlanner } from '@/context/PlannerContext';
 import { useWeather } from '@/hooks/useWeather';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   MapPin, Wallet, Footprints, Route, Train, Ticket, GraduationCap,
-  Wind, CloudRain, Globe, Building2, ChevronLeft, ChevronRight,
+  Wind, CloudRain, ChevronLeft, ChevronRight, CalendarDays, Search,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { HeadingToCard } from '@/components/sidebar/HeadingToCard';
+import { DatesCard } from '@/components/sidebar/DatesCard';
 
 const STORAGE_KEY = 'tageplan_sidebar_collapsed';
 
@@ -20,8 +22,7 @@ function getInitialCollapsed(): boolean {
 
 export function PlannerSidebar() {
   const {
-    country, setCountry, cityId, setCityId, cities,
-    stepGoal, setStepGoal, budget, setBudget,
+    country, stepGoal, setStepGoal, budget, setBudget,
     dTicketMode, setDTicketMode, freeOnly, setFreeOnly,
     isicActive, setIsicActive, stats, selectedCity,
   } = usePlanner();
@@ -62,35 +63,17 @@ export function PlannerSidebar() {
           <WeatherCard cityName={selectedCity.name} weather={weather} loading={loading} error={error} />
         )}
 
-        {/* Country */}
+        {/* Heading To + Dates */}
         {collapsed ? (
-          <CollapsedIcon icon={<Globe className="w-4 h-4" />} label="Country" />
+          <>
+            <CollapsedIcon icon={<Search className="w-4 h-4" />} label="Heading to" />
+            <CollapsedIcon icon={<CalendarDays className="w-4 h-4" />} label="Dates" />
+          </>
         ) : (
-          <SidebarCard title="Country">
-            <motion.div {...fadeProps} className="flex gap-2">
-              <PillButton active={country === 'DE'} onClick={() => setCountry('DE')}>🇩🇪 Germany</PillButton>
-              <PillButton active={country === 'AT'} onClick={() => setCountry('AT')}>🇦🇹 Austria</PillButton>
-            </motion.div>
-          </SidebarCard>
-        )}
-
-        {/* City */}
-        {collapsed ? (
-          <CollapsedIcon icon={<Building2 className="w-4 h-4" />} label="Destination" />
-        ) : (
-          <SidebarCard title="Destination">
-            <motion.div {...fadeProps}>
-              <select
-                value={cityId}
-                onChange={e => setCityId(e.target.value)}
-                className="w-full bg-background text-foreground border border-border rounded-lg px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-              >
-                {cities.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-            </motion.div>
-          </SidebarCard>
+          <motion.div {...fadeProps} className="flex flex-col gap-3">
+            <HeadingToCard />
+            <DatesCard />
+          </motion.div>
         )}
 
         {/* Step Goal */}
@@ -262,20 +245,6 @@ function SidebarCard({ title, children }: { title: string; children: React.React
   );
 }
 
-function PillButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all shadow-pill ${
-        active
-          ? 'bg-primary text-primary-foreground shadow-card-hover'
-          : 'bg-background text-muted-foreground hover:text-foreground hover:bg-secondary'
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
 
 function ToggleRow({ icon, label, checked, onChange, disabled }: {
   icon: React.ReactNode; label: string; checked: boolean; onChange: (b: boolean) => void; disabled?: boolean
