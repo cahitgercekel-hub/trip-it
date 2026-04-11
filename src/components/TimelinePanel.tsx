@@ -75,7 +75,7 @@ export function TimelinePanel() {
                 <div className="h-6 w-16 bg-muted rounded" />
               </div>
             ) : weather ? (
-             
+              <div className="rounded-lg p-3 bg-secondary/50 border border-border/50">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-medium opacity-90">{selectedCity.name}</span>
                   <span className="text-lg">{weather.icon}</span>
