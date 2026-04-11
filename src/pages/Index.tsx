@@ -35,11 +35,6 @@ function PlannerLayout() {
           <div className="hidden sm:flex items-center gap-1.5 text-sm text-muted-foreground bg-secondary px-3 py-1 rounded-full">
             <span>{flag}</span>
             <span className="font-medium text-foreground">{selectedCity.name}</span>
-            {weather && (
-              <span className="flex items-center gap-1 ml-1 text-foreground">
-                {weather.icon} {weather.temp}°C
-              </span>
-            )}
           </div>
         </div>
       </header>
