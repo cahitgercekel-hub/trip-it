@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
+import { createContext, useContext, useState, ReactNode, useMemo, useCallback, useRef } from 'react';
 import { CITIES_DATA, City, POI } from '@/data/cities';
+import { buildItineraryRequest, generateItinerary } from '@/lib/api';
 import { getTotalDistance, getTotalSteps, getEstimatedCost } from '@/lib/planner';
 
 function getStoredTime(key: string, fallback: string): string {
