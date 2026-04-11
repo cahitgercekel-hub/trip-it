@@ -152,6 +152,25 @@ export function PlannerSidebar() {
         )}
       </TooltipProvider>
     </motion.aside>
+
+    {/* Floating re-open tab — rendered outside aside to avoid overflow clipping */}
+    {collapsed && (
+      <motion.button
+        initial={{ opacity: 0, x: -4 }}
+        animate={{ opacity: 1, x: 0 }}
+        onClick={() => setCollapsed(false)}
+        className="fixed left-[52px] top-1/2 -translate-y-1/2 z-50 bg-card border border-border border-l-2 border-l-primary rounded-r-lg px-1.5 py-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-secondary hover:border-primary/30 hover:scale-[1.03] transition-all"
+      >
+        <ChevronRight className="w-3.5 h-3.5 text-primary" />
+        <span
+          className="text-[10px] text-muted-foreground font-medium tracking-wider"
+          style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+        >
+          Menu
+        </span>
+      </motion.button>
+    )}
+    </>
   );
 }
 
