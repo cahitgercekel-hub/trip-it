@@ -68,14 +68,31 @@ export function TimelinePanel() {
     }
   });
 
+  // Check if schedule overflows end time
+  const scheduleOverflow = filteredPois.length > 0 && currentMinutes > dayEndMinutes;
+  const tooManyStops = filteredPois.length > 0 && ((dayEndMinutes - dayStartMinutes) / filteredPois.length) < 30;
+
   return (
     <div className="w-[340px] h-full overflow-y-auto p-5 bg-background border-r border-border">
       <div className="mb-5">
         <h2 className="text-base font-bold text-foreground">Your Itinerary</h2>
         <p className="text-xs text-muted-foreground mt-0.5">
-          {filteredPois.length} stops · {minutesToTime(9 * 60)} – {minutesToTime(currentMinutes)}
+          {filteredPois.length} stops · {minutesToTime(dayStartMinutes)} – {minutesToTime(currentMinutes)}
         </p>
       </div>
+
+      {/* Too many stops warning */}
+      {tooManyStops && (
+        <div className="mb-4 bg-amber-950/60 border border-amber-500/30 rounded-lg px-4 py-2 text-xs text-amber-300">
+          ⚠️ Too many stops for this time window. Remove some or extend your day.
+        </div>
+      )}
+
+      {scheduleOverflow && !tooManyStops && (
+        <div className="mb-4 bg-amber-950/60 border border-amber-500/30 rounded-lg px-4 py-2 text-xs text-amber-300">
+          ⚠️ Itinerary extends past your {minutesToTime(dayEndMinutes)} end time.
+        </div>
+      )}
 
       <div className="mb-4 flex items-start gap-2 bg-secondary/50 border border-border/50 rounded-lg px-3 py-2">
         <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
