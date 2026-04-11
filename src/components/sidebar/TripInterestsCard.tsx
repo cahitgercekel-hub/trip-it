@@ -38,24 +38,6 @@ export function TripInterestsCard() {
           );
         })}
       </div>
-      {tripInterests.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-2.5 pt-2 border-t border-border">
-          {tripInterests.map(id => {
-            const cat = TRIP_CATEGORIES.find(c => c.id === id);
-            if (!cat) return null;
-            const Icon = cat.icon;
-            return (
-              <span
-                key={id}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-medium"
-              >
-                <Icon className="w-2.5 h-2.5" />
-                {cat.label}
-              </span>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }
