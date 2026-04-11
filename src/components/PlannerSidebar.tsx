@@ -30,6 +30,7 @@ export function PlannerSidebar() {
     country, stepGoal, setStepGoal, budget, setBudget,
     dTicketMode, setDTicketMode, freeOnly, setFreeOnly,
     isicActive, setIsicActive, selectedCity,
+    tripGenerated, setTripGenerated,
   } = usePlanner();
 
   const { weather, loading, error } = useWeather(selectedCity.center[0], selectedCity.center[1]);
