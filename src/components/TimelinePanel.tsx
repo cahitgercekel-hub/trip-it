@@ -21,6 +21,7 @@ interface TimelineEntry {
 
 export function TimelinePanel() {
   const { filteredPois, stepGoal, dTicketMode, isicActive, rainyFilter, setRainyFilter, selectedCity } = usePlanner();
+  const { weather, loading: weatherLoading } = useWeather(selectedCity.center[0], selectedCity.center[1]);
   const [collapsed, setCollapsed] = useState(getInitialTimelineCollapsed);
 
   useEffect(() => {
