@@ -8,7 +8,7 @@ import {
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { HeadingToCard } from '@/components/sidebar/HeadingToCard';
 import { DatesCard } from '@/components/sidebar/DatesCard';
-import { DayScheduleCard } from '@/components/sidebar/DayScheduleCard';
+
 import { WeatherPackingCard } from '@/components/sidebar/WeatherPackingCard';
 import { CostEstimationCard } from '@/components/sidebar/CostEstimationCard';
 import { TripInterestsCard } from '@/components/sidebar/TripInterestsCard';
@@ -45,7 +45,7 @@ export function PlannerSidebar() {
               <HeadingToCard />
               <DatesCard />
               <TripInterestsCard />
-              <DayScheduleCard />
+              
 
               {/* Step Goal */}
               <SidebarCard title="Step Goal">
