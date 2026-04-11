@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useMemo } from 'react';
+import { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
 import { CITIES_DATA, City, POI } from '@/data/cities';
 import { getTotalDistance, getTotalSteps, getEstimatedCost } from '@/lib/planner';
 
@@ -13,7 +13,19 @@ interface PlannerState {
   rainyFilter: boolean;
   tripInterests: string[];
   tripGenerated: boolean;
+  tripLoading: boolean;
+  loadingStep: number;
 }
+
+const LOADING_STEPS = [
+  'Analyze User Preference...',
+  'Retrieve Resources...',
+  'Searched Top Attractions...',
+  'Searched Accommodations and Hotels...',
+  'Transportation Overview...',
+  'Local Guide...',
+  'Creating Itinerary...',
+];
 
 interface PlannerContextType extends PlannerState {
   setCountry: (c: 'DE' | 'AT') => void;
@@ -26,6 +38,8 @@ interface PlannerContextType extends PlannerState {
   setRainyFilter: (b: boolean) => void;
   toggleTripInterest: (id: string) => void;
   setTripGenerated: (b: boolean) => void;
+  generateTrip: () => void;
+  loadingSteps: string[];
   cities: City[];
   selectedCity: City;
   filteredPois: POI[];
@@ -51,6 +65,8 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const [rainyFilter, setRainyFilter] = useState(false);
   const [tripInterests, setTripInterests] = useState<string[]>(['culture', 'nature']);
   const [tripGenerated, setTripGenerated] = useState(false);
+  const [tripLoading, setTripLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
 
   const toggleTripInterest = (id: string) => {
     setTripInterests(prev =>
@@ -65,31 +81,41 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     if (c === 'AT') setDTicketMode(false);
   };
 
+  const generateTrip = useCallback(() => {
+    if (tripLoading) return;
+    setTripLoading(true);
+    setTripGenerated(false);
+    setLoadingStep(0);
+
+    let step = 0;
+    const interval = setInterval(() => {
+      step++;
+      if (step >= LOADING_STEPS.length) {
+        clearInterval(interval);
+        setTripLoading(false);
+        setTripGenerated(true);
+      } else {
+        setLoadingStep(step);
+      }
+    }, 700);
+  }, [tripLoading]);
+
   const cities = useMemo(() => CITIES_DATA.filter(c => c.country === country), [country]);
   const selectedCity = useMemo(() => CITIES_DATA.find(c => c.id === cityId) || CITIES_DATA[0], [cityId]);
 
   const filteredPois = useMemo(() => {
     let pois = selectedCity.pois;
-
-    // Rainy weather: filter out Nature POIs
-    if (rainyFilter) {
-      pois = pois.filter(p => p.category === 'Culture');
-    }
-
+    if (rainyFilter) pois = pois.filter(p => p.category === 'Culture');
     if (freeOnly) pois = pois.filter(p => p.isFree);
     if (dTicketMode && country === 'DE') pois = pois.filter(p => p.dTicket);
-
     pois = pois.filter(p => {
       const price = isicActive && p.hasISIC ? p.price * 0.5 : p.price;
       return price <= budget;
     });
-
-    // Filter by trip interests — map POI categories to interest ids
     if (tripInterests.length > 0) {
       const categoryMap: Record<string, string> = { Culture: 'culture', Nature: 'nature' };
       pois = pois.filter(p => tripInterests.includes(categoryMap[p.category] || ''));
     }
-
     return pois;
   }, [selectedCity, rainyFilter, freeOnly, dTicketMode, country, budget, isicActive, tripInterests]);
 
@@ -102,9 +128,10 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
 
   return (
     <PlannerContext.Provider value={{
-      country, cityId, stepGoal, budget, dTicketMode, freeOnly, isicActive, rainyFilter, tripInterests, tripGenerated,
+      country, cityId, stepGoal, budget, dTicketMode, freeOnly, isicActive, rainyFilter, tripInterests, tripGenerated, tripLoading, loadingStep,
       setCountry, setCityId, setStepGoal, setBudget, setDTicketMode, setFreeOnly, setIsicActive,
-      setRainyFilter, toggleTripInterest, setTripGenerated,
+      setRainyFilter, toggleTripInterest, setTripGenerated, generateTrip,
+      loadingSteps: LOADING_STEPS,
       cities, selectedCity, filteredPois, stats,
     }}>
       {children}
