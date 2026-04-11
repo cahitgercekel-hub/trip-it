@@ -70,8 +70,6 @@ export function PlannerSidebar() {
           <WeatherCard cityName={selectedCity.name} weather={weather} loading={loading} error={error} />
         )}
 
-        {/* Flights */}
-        <FlightCard collapsed={collapsed} />
 
         {/* Heading To + Dates */}
         {collapsed ? (
