@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["DM Sans", "sans-serif"],
+        sans: ["DM Sans", "system-ui", "-apple-system", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -42,6 +42,10 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        action: {
+          DEFAULT: "hsl(var(--action))",
+          foreground: "hsl(var(--action-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -50,21 +54,25 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        surface: {
-          DEFAULT: "hsl(var(--surface))",
-          2: "hsl(var(--surface-2))",
+        culture: {
+          DEFAULT: "hsl(var(--culture))",
+          light: "hsl(var(--culture-light))",
         },
-        emerald: {
-          DEFAULT: "hsl(var(--emerald))",
+        nature: {
+          DEFAULT: "hsl(var(--nature))",
+          light: "hsl(var(--nature-light))",
         },
-        indigo: {
-          DEFAULT: "hsl(var(--indigo))",
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          light: "hsl(var(--info-light))",
         },
-        sky: {
-          DEFAULT: "hsl(var(--sky))",
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          light: "hsl(var(--warning-light))",
         },
-        rose: {
-          DEFAULT: "hsl(var(--rose))",
+        danger: {
+          DEFAULT: "hsl(var(--danger))",
+          light: "hsl(var(--danger-light))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
@@ -81,6 +89,11 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        card: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+        "card-hover": "0 4px 12px rgba(0,0,0,0.08)",
+        pill: "0 1px 2px rgba(0,0,0,0.05)",
       },
       keyframes: {
         "accordion-down": {
