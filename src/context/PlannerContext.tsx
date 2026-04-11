@@ -99,9 +99,9 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
 
   return (
     <PlannerContext.Provider value={{
-      country, cityId, stepGoal, budget, dTicketMode, freeOnly, isicActive, rainyFilter, mapFilter,
+      country, cityId, stepGoal, budget, dTicketMode, freeOnly, isicActive, rainyFilter, tripInterests,
       setCountry, setCityId, setStepGoal, setBudget, setDTicketMode, setFreeOnly, setIsicActive,
-      setRainyFilter, setMapFilter,
+      setRainyFilter, toggleTripInterest,
       cities, selectedCity, filteredPois, stats,
     }}>
       {children}

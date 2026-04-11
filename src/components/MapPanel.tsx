@@ -3,7 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { usePlanner } from '@/context/PlannerContext';
-import { Landmark, TreePine, Ticket } from 'lucide-react';
+import { Ticket } from 'lucide-react';
+import { TripInterestsBar } from '@/components/TripInterestsBar';
 
 function MapController() {
   const { selectedCity } = usePlanner();
@@ -28,49 +29,33 @@ function createMarkerIcon(category: 'Culture' | 'Nature') {
 }
 
 export function MapPanel() {
-  const { selectedCity, filteredPois, mapFilter, setMapFilter, isicActive, cityId, setCityId, cities } = usePlanner();
+  const { selectedCity, filteredPois, isicActive, cityId, setCityId, cities } = usePlanner();
 
   return (
     <div className="flex-1 h-screen relative">
       {/* Top bar */}
-      <div className="absolute top-3 left-3 right-3 z-[1000] flex items-center justify-between gap-3">
-        {/* City tabs */}
-        <div className="flex items-center gap-0.5 bg-card/95 backdrop-blur-sm border border-border rounded-lg px-1.5 py-1 overflow-x-auto max-w-[65%] shadow-card">
-          {cities.map(c => (
-            <button
-              key={c.id}
-              onClick={() => setCityId(c.id)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all ${
-                c.id === cityId
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-              }`}
-            >
-              {c.name}
-            </button>
-          ))}
+      <div className="absolute top-3 left-3 right-3 z-[1000] flex flex-col gap-2">
+        <div className="flex items-center justify-between gap-3">
+          {/* City tabs */}
+          <div className="flex items-center gap-0.5 bg-card/95 backdrop-blur-sm border border-border rounded-lg px-1.5 py-1 overflow-x-auto max-w-[65%] shadow-card">
+            {cities.map(c => (
+              <button
+                key={c.id}
+                onClick={() => setCityId(c.id)}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all ${
+                  c.id === cityId
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                }`}
+              >
+                {c.name}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Filter pills */}
-        <div className="flex gap-0.5 bg-card/95 backdrop-blur-sm border border-border rounded-lg px-1.5 py-1 shadow-card">
-          {(['All', 'Culture', 'Nature'] as const).map(f => (
-            <button
-              key={f}
-              onClick={() => setMapFilter(f)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5 ${
-                mapFilter === f
-                  ? f === 'Culture' ? 'bg-culture text-primary-foreground shadow-sm'
-                    : f === 'Nature' ? 'bg-nature text-primary-foreground shadow-sm'
-                    : 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-              }`}
-            >
-              {f === 'Culture' && <Landmark className="w-3 h-3" />}
-              {f === 'Nature' && <TreePine className="w-3 h-3" />}
-              {f}
-            </button>
-          ))}
-        </div>
+        {/* Trip interests bar */}
+        <TripInterestsBar />
       </div>
 
       {/* Legend */}
