@@ -1,7 +1,8 @@
 import { usePlanner } from '@/context/PlannerContext';
 import { haversine, getTransportRecommendation, type TransportRecommendation } from '@/lib/planner';
+import { useWeather } from '@/hooks/useWeather';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Landmark, TreePine, Droplets, TrainFront, Ticket, X, PanelLeftClose, ChevronRight, Footprints, Car, Info } from 'lucide-react';
+import { Landmark, TreePine, Droplets, TrainFront, Ticket, X, PanelLeftClose, ChevronRight, Footprints, Car, Info, Wind, CloudRain } from 'lucide-react';
 import type { POI } from '@/data/cities';
 import { useState, useEffect } from 'react';
 
