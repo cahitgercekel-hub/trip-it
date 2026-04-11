@@ -29,7 +29,7 @@ function formatDuration(mins: number): string {
 }
 
 export function TimelinePanel() {
-  const { filteredPois, stepGoal, dTicketMode, isicActive, rainyFilter, setRainyFilter, selectedCity } = usePlanner();
+  const { filteredPois, stepGoal, dTicketMode, isicActive, rainyFilter, setRainyFilter, selectedCity, aiItinerary } = usePlanner();
   const { dayStartMinutes, dayEndMinutes } = usePlanner();
 
   // Build duration-aware timeline
@@ -94,76 +94,99 @@ export function TimelinePanel() {
         </div>
       )}
 
-      <div className="mb-4 flex items-start gap-2 bg-secondary/50 border border-border/50 rounded-lg px-3 py-2">
-        <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
-        <p className="text-[10px] text-muted-foreground leading-relaxed">
-          Times are estimated based on visit duration and travel time.
-        </p>
-      </div>
-
-      {/* Rainy weather banner */}
-      <AnimatePresence>
-        {rainyFilter && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-4"
-          >
-            <div className="bg-danger-light border border-danger/20 rounded-lg px-4 py-2.5 flex items-start justify-between gap-2">
-              <p className="text-xs text-foreground leading-relaxed">
-                <span className="font-semibold">⛈️ Rainy weather detected in {selectedCity.name}</span>
-                <br />
-                <span className="text-muted-foreground">Showing indoor spots only.</span>
-              </p>
-              <button
-                onClick={() => setRainyFilter(false)}
-                className="shrink-0 mt-0.5 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence mode="popLayout">
-        {entries.map((entry, i) => (
-          <motion.div
-            key={`${entry.type}-${i}`}
-            layout
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -8 }}
-            transition={{ delay: i * 0.03 }}
-            className="flex gap-3"
-          >
-            <div className="flex flex-col items-center w-12 shrink-0">
-              <span className="text-[11px] text-muted-foreground font-mono font-medium">{entry.startTime}</span>
-              <div className={`w-2.5 h-2.5 rounded-full mt-1.5 ring-2 ring-offset-2 ring-offset-background ${getDotStyle(entry)}`} />
-              {i < entries.length - 1 && <div className="w-px flex-1 bg-border min-h-[20px]" />}
-            </div>
-            <div className={`flex-1 mb-3 rounded-lg border p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover ${getCardStyle(entry)}`}>
-              {entry.type === 'poi' && entry.poi && (
-                <POICard
-                  poi={entry.poi}
-                  isicActive={isicActive}
-                  visitMinutes={entry.visitMinutes!}
-                  startTime={entry.startTime}
-                  endTime={entry.endTime!}
+      {/* AI-generated itinerary */}
+      {aiItinerary ? (
+        <div className="prose prose-sm prose-invert max-w-none">
+          <div className="text-xs text-foreground leading-relaxed whitespace-pre-wrap [&_strong]:font-bold [&_em]:italic">
+            {aiItinerary.split('\n').map((line, i) => {
+              // Bold lines (markdown **text** or *text*)
+              const formatted = line
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>');
+              return (
+                <p
+                  key={i}
+                  className={`mb-1 ${line.startsWith('*') ? 'pl-2 border-l-2 border-primary/30 ml-1' : ''}`}
+                  dangerouslySetInnerHTML={{ __html: formatted || '&nbsp;' }}
                 />
-              )}
-              {entry.type === 'transport' && entry.transport && <TransportCard transport={entry.transport} dTicketMode={dTicketMode} />}
-            </div>
-          </motion.div>
-        ))}
-      </AnimatePresence>
-
-      {filteredPois.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-sm text-muted-foreground">No POIs match your current filters.</p>
-          <p className="text-xs text-muted-foreground mt-1">Try adjusting your budget or toggles.</p>
+              );
+            })}
+          </div>
         </div>
+      ) : (
+        <>
+          <div className="mb-4 flex items-start gap-2 bg-secondary/50 border border-border/50 rounded-lg px-3 py-2">
+            <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
+            <p className="text-[10px] text-muted-foreground leading-relaxed">
+              Times are estimated based on visit duration and travel time.
+            </p>
+          </div>
+
+          {/* Rainy weather banner */}
+          <AnimatePresence>
+            {rainyFilter && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-4"
+              >
+                <div className="bg-danger-light border border-danger/20 rounded-lg px-4 py-2.5 flex items-start justify-between gap-2">
+                  <p className="text-xs text-foreground leading-relaxed">
+                    <span className="font-semibold">⛈️ Rainy weather detected in {selectedCity.name}</span>
+                    <br />
+                    <span className="text-muted-foreground">Showing indoor spots only.</span>
+                  </p>
+                  <button
+                    onClick={() => setRainyFilter(false)}
+                    className="shrink-0 mt-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence mode="popLayout">
+            {entries.map((entry, i) => (
+              <motion.div
+                key={`${entry.type}-${i}`}
+                layout
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -8 }}
+                transition={{ delay: i * 0.03 }}
+                className="flex gap-3"
+              >
+                <div className="flex flex-col items-center w-12 shrink-0">
+                  <span className="text-[11px] text-muted-foreground font-mono font-medium">{entry.startTime}</span>
+                  <div className={`w-2.5 h-2.5 rounded-full mt-1.5 ring-2 ring-offset-2 ring-offset-background ${getDotStyle(entry)}`} />
+                  {i < entries.length - 1 && <div className="w-px flex-1 bg-border min-h-[20px]" />}
+                </div>
+                <div className={`flex-1 mb-3 rounded-lg border p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover ${getCardStyle(entry)}`}>
+                  {entry.type === 'poi' && entry.poi && (
+                    <POICard
+                      poi={entry.poi}
+                      isicActive={isicActive}
+                      visitMinutes={entry.visitMinutes!}
+                      startTime={entry.startTime}
+                      endTime={entry.endTime!}
+                    />
+                  )}
+                  {entry.type === 'transport' && entry.transport && <TransportCard transport={entry.transport} dTicketMode={dTicketMode} />}
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+
+          {filteredPois.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-sm text-muted-foreground">No POIs match your current filters.</p>
+              <p className="text-xs text-muted-foreground mt-1">Try adjusting your budget or toggles.</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
