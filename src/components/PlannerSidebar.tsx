@@ -30,9 +30,6 @@ export function PlannerSidebar() {
   return (
     <div className="flex flex-col gap-3 p-3">
       <TooltipProvider delayDuration={200}>
-        {/* Weather */}
-        <WeatherCard cityName={selectedCity.name} weather={weather} loading={loading} error={error} />
-
         {/* Heading To + Dates */}
         <HeadingToCard />
         <DatesCard />
@@ -89,7 +86,7 @@ export function PlannerSidebar() {
           🚀 Trip It!
         </button>
 
-        {/* Weather & Packing + Cost Estimation — only after Trip It! */}
+        {/* Post-analysis: Weather, Packing, Cost — only after Trip It! */}
         {tripGenerated && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -97,6 +94,7 @@ export function PlannerSidebar() {
             transition={{ duration: 0.3 }}
             className="flex flex-col gap-3"
           >
+            <WeatherCard cityName={selectedCity.name} weather={weather} loading={loading} error={error} />
             <WeatherPackingCard />
             <CostEstimationCard />
           </motion.div>
