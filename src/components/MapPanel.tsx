@@ -29,7 +29,7 @@ function createMarkerIcon(category: 'Culture' | 'Nature') {
 }
 
 export function MapPanel() {
-  const { selectedCity, filteredPois, isicActive, cityId, setCityId, cities } = usePlanner();
+  const { selectedCity, filteredPois, isicActive } = usePlanner();
 
   return (
     <div className="flex-1 h-screen relative">
