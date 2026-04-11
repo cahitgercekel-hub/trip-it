@@ -1,12 +1,14 @@
 import { usePlanner } from '@/context/PlannerContext';
 import { useWeather } from '@/hooks/useWeather';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   MapPin, Wallet, Footprints, Route, Train, Ticket, GraduationCap,
-  Wind, CloudRain, Globe, Building2, ChevronLeft, ChevronRight,
+  Wind, CloudRain, Calendar, ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { HeadingToCard } from '@/components/sidebar/HeadingToCard';
+import { DatesCard } from '@/components/sidebar/DatesCard';
 
 const STORAGE_KEY = 'tageplan_sidebar_collapsed';
 
