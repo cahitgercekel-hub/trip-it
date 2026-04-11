@@ -3,7 +3,7 @@ import { useWeather } from '@/hooks/useWeather';
 import { motion } from 'framer-motion';
 import {
   MapPin, Wallet, Footprints, Route, Train, Ticket, GraduationCap,
-  Wind, CloudRain, Calendar, ChevronLeft, ChevronRight,
+  Wind, CloudRain, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Search,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
