@@ -1,7 +1,7 @@
 import { usePlanner } from '@/context/PlannerContext';
-import { haversine } from '@/lib/planner';
+import { haversine, getTransportRecommendation, type TransportRecommendation } from '@/lib/planner';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Landmark, TreePine, Droplets, TrainFront, Ticket, X, PanelLeftClose, ChevronRight } from 'lucide-react';
+import { Landmark, TreePine, Droplets, TrainFront, Ticket, X, PanelLeftClose, ChevronRight, Footprints, Car, Info } from 'lucide-react';
 import type { POI } from '@/data/cities';
 import { useState, useEffect } from 'react';
 
@@ -12,11 +12,10 @@ function getInitialTimelineCollapsed(): boolean {
 }
 
 interface TimelineEntry {
-  type: 'poi' | 'refill' | 'warning';
+  type: 'poi' | 'refill' | 'transport';
   poi?: POI;
   time: string;
-  distance?: number;
-  steps?: number;
+  transport?: TransportRecommendation;
 }
 
 export function TimelinePanel() {
@@ -26,9 +25,6 @@ export function TimelinePanel() {
   useEffect(() => {
     try { localStorage.setItem(TIMELINE_KEY, String(collapsed)); } catch {}
   }, [collapsed]);
-
-  const gapCount = Math.max(filteredPois.length - 1, 1);
-  const stepsPerGap = stepGoal / gapCount;
 
   const entries: TimelineEntry[] = [];
   let hour = 9;
@@ -40,13 +36,9 @@ export function TimelinePanel() {
     if (i < filteredPois.length - 1) {
       const next = filteredPois[i + 1];
       const dist = haversine(poi.lat, poi.lng, next.lat, next.lng);
-      const steps = Math.round(dist * 1350);
+      const transport = getTransportRecommendation(dist, stepGoal, dTicketMode);
 
-      if (steps > stepsPerGap) {
-        entries.push({ type: 'warning', time: `${String(hour).padStart(2, '0')}:00`, distance: dist, steps });
-      } else {
-        entries.push({ type: 'refill', time: `${String(hour).padStart(2, '0')}:00` });
-      }
+      entries.push({ type: 'transport', time: `${String(hour).padStart(2, '0')}:00`, transport });
       hour++;
     }
   });
@@ -71,6 +63,14 @@ export function TimelinePanel() {
             >
               <PanelLeftClose className="w-4 h-4 text-foreground" />
             </button>
+          </div>
+
+          {/* Walking preference hint */}
+          <div className="mb-4 flex items-start gap-2 bg-secondary/50 border border-border/50 rounded-lg px-3 py-2">
+            <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
+            <p className="text-[10px] text-muted-foreground leading-relaxed">
+              Transport recommendations adapt to your walking goal ({stepGoal.toLocaleString()} steps).
+            </p>
           </div>
 
           {/* Rainy weather banner */}
@@ -120,8 +120,7 @@ export function TimelinePanel() {
                 {/* Card */}
                 <div className={`flex-1 mb-3 rounded-lg border p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover ${getCardStyle(entry)}`}>
                   {entry.type === 'poi' && entry.poi && <POICard poi={entry.poi} isicActive={isicActive} />}
-                  {entry.type === 'refill' && <RefillCard />}
-                  {entry.type === 'warning' && <WarningCard distance={entry.distance!} dTicketMode={dTicketMode} />}
+                  {entry.type === 'transport' && entry.transport && <TransportCard transport={entry.transport} dTicketMode={dTicketMode} />}
                 </div>
               </motion.div>
             ))}
@@ -158,6 +157,7 @@ export function TimelinePanel() {
   );
 }
 
+/* ─── POI Card ─── */
 function POICard({ poi, isicActive }: { poi: POI; isicActive: boolean }) {
   const isCulture = poi.category === 'Culture';
   const Icon = isCulture ? Landmark : TreePine;
@@ -195,45 +195,78 @@ function POICard({ poi, isicActive }: { poi: POI; isicActive: boolean }) {
   );
 }
 
-function RefillCard() {
-  return (
-    <div className="flex items-center gap-2.5">
-      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-info-light text-info">
-        <Droplets className="w-4 h-4" />
-      </div>
-      <div>
-        <p className="text-xs font-medium text-foreground">Water Refill</p>
-        <p className="text-[11px] text-muted-foreground">Fountain nearby — refill your bottle</p>
-      </div>
-    </div>
-  );
-}
+/* ─── Transport Card ─── */
+function TransportCard({ transport, dTicketMode }: { transport: TransportRecommendation; dTicketMode: boolean }) {
+  const { mode, distanceKm, totalMinutes, walkMinutes, rideMinutes, waitMinutes, transitType, label, walkingAdjusted, walkingTag } = transport;
 
-function WarningCard({ distance, dTicketMode }: { distance: number; dTicketMode: boolean }) {
+  const ModeIcon = mode === 'walk' ? Footprints : mode === 'taxi' ? Car : TrainFront;
+  const iconBg = mode === 'walk' ? 'bg-nature-light text-nature' : mode === 'taxi' ? 'bg-warning-light text-warning' : 'bg-primary/10 text-primary';
+
+  // Build time breakdown string
+  let breakdown = '';
+  if (mode === 'walk') {
+    breakdown = `${totalMinutes} min walk`;
+  } else if (mode === 'transit') {
+    const parts: string[] = [];
+    if (walkMinutes > 0) parts.push(`${walkMinutes} min walk`);
+    if (waitMinutes > 0) parts.push(`${waitMinutes} min wait`);
+    if (rideMinutes > 0) parts.push(`${rideMinutes} min ${transitType}`);
+    breakdown = parts.join(' + ');
+  } else if (mode === 'taxi') {
+    const parts: string[] = [];
+    if (waitMinutes > 0) parts.push(`${waitMinutes} min pickup`);
+    if (rideMinutes > 0) parts.push(`${rideMinutes} min ride`);
+    breakdown = parts.join(' + ');
+  }
+
+  const timeLabel = mode === 'walk'
+    ? `${totalMinutes} min walk`
+    : `${totalMinutes} min total`;
+
   return (
-    <div className="flex items-center gap-2.5">
-      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-warning-light text-warning">
-        <TrainFront className="w-4 h-4" />
+    <div className="flex items-start gap-2.5">
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${iconBg}`}>
+        <ModeIcon className="w-4 h-4" />
       </div>
-      <div>
-        <p className="text-xs font-medium text-foreground">Take Public Transit</p>
-        <p className="text-[11px] text-muted-foreground">
-          {distance.toFixed(1)}km — S-Bahn recommended {dTicketMode && <span className="text-primary font-medium">· D-Ticket ✓</span>}
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-semibold text-foreground">{label}</p>
+        <p className="text-[12px] font-bold text-foreground mt-0.5">
+          {timeLabel} · {distanceKm.toFixed(1)} km
         </p>
+        {mode !== 'walk' && breakdown && (
+          <p className="text-[11px] text-muted-foreground mt-0.5">{breakdown}</p>
+        )}
+        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+          {dTicketMode && mode === 'transit' && (
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">D-Ticket ✓</span>
+          )}
+          {walkingAdjusted && walkingTag && (
+            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-secondary text-muted-foreground italic">
+              {walkingTag}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
+/* ─── Helpers ─── */
 function getDotStyle(entry: TimelineEntry) {
-  if (entry.type === 'refill') return 'bg-info ring-info/30';
-  if (entry.type === 'warning') return 'bg-warning ring-warning/30';
+  if (entry.type === 'transport') {
+    if (entry.transport?.mode === 'walk') return 'bg-nature ring-nature/30';
+    if (entry.transport?.mode === 'taxi') return 'bg-warning ring-warning/30';
+    return 'bg-primary ring-primary/30';
+  }
   if (entry.poi?.category === 'Culture') return 'bg-culture ring-culture/30';
   return 'bg-nature ring-nature/30';
 }
 
 function getCardStyle(entry: TimelineEntry) {
-  if (entry.type === 'refill') return 'bg-info-light border-info/20';
-  if (entry.type === 'warning') return 'bg-warning-light border-warning/20';
+  if (entry.type === 'transport') {
+    if (entry.transport?.mode === 'walk') return 'bg-nature-light/50 border-nature/15';
+    if (entry.transport?.mode === 'taxi') return 'bg-warning-light border-warning/20';
+    return 'bg-primary/5 border-primary/15';
+  }
   return 'bg-card border-border shadow-card';
 }
