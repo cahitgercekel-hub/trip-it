@@ -27,7 +27,7 @@ export function PlannerSidebar() {
   const {
     country, stepGoal, setStepGoal, budget, setBudget,
     dTicketMode, setDTicketMode, freeOnly, setFreeOnly,
-    isicActive, setIsicActive, stats, selectedCity,
+    isicActive, setIsicActive, selectedCity,
   } = usePlanner();
 
   const { weather, loading, error } = useWeather(selectedCity.center[0], selectedCity.center[1]);
@@ -269,14 +269,5 @@ function ToggleRow({ icon, label, checked, onChange, disabled }: {
         <span className={`absolute top-[3px] w-4 h-4 rounded-full shadow-sm transition-transform ${checked ? 'left-[18px] bg-primary-foreground' : 'left-[3px] bg-card'}`} />
       </button>
     </label>
-  );
-}
-
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="bg-card border border-border rounded-lg p-3 shadow-card flex flex-col gap-1">
-      <div className="flex items-center gap-1.5">{icon}<span className="text-[11px] text-muted-foreground font-medium">{label}</span></div>
-      <span className="text-lg font-bold text-foreground">{value}</span>
-    </div>
   );
 }
