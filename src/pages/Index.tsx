@@ -92,10 +92,12 @@ function PlannerLayout() {
   );
 }
 
-const Index = () => (
-  <PlannerProvider>
-    <PlannerLayout />
-  </PlannerProvider>
-);
+const Index = () => {
+  return (
+    <PlannerProvider>
+      <PlannerLayout />
+    </PlannerProvider>
+  );
+};
 
 export default Index;
