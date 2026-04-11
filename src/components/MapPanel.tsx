@@ -86,9 +86,6 @@ export function MapPanel() {
       >
         <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
         <MapController />
-        <L.Control position="bottomright">
-          {/* Zoom handled by leaflet default but repositioned */}
-        </L.Control>
         {filteredPois.map(poi => (
           <Marker key={poi.id} position={[poi.lat, poi.lng]} icon={createMarkerIcon(poi.category)}>
             <Popup>
