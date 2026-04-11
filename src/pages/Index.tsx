@@ -5,13 +5,13 @@ import { TimelinePanel } from '@/components/TimelinePanel';
 import { MapPanel } from '@/components/MapPanel';
 import { TripLoadingOverlay } from '@/components/TripLoadingOverlay';
 import { useWeather } from '@/hooks/useWeather';
-import { Menu, X, Globe } from 'lucide-react';
+import { Menu, X, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 function PlannerLayout() {
-  const { selectedCity, country, setRainyFilter } = usePlanner();
+  const { selectedCity, country, setRainyFilter, tripGenerated } = usePlanner();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const flag = country === 'DE' ? '🇩🇪' : '🇦🇹';
+  const [itineraryExpanded, setItineraryExpanded] = useState(true);
 
   const { weather } = useWeather(selectedCity.center[0], selectedCity.center[1]);
 
@@ -20,6 +20,11 @@ function PlannerLayout() {
       setRainyFilter(weather.isRainy);
     }
   }, [weather, setRainyFilter]);
+
+  // Reset expanded state when a new trip is generated
+  useEffect(() => {
+    if (tripGenerated) setItineraryExpanded(true);
+  }, [tripGenerated]);
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -42,9 +47,30 @@ function PlannerLayout() {
           <PlannerSidebar />
         </div>
 
-        <div className="hidden lg:flex">
-          <TimelinePanel />
-        </div>
+        {/* Itinerary panel — only after generation */}
+        {tripGenerated && (
+          <div className="hidden lg:flex relative shrink-0">
+            {/* Panel with animated width */}
+            <div
+              className="h-full overflow-hidden transition-all duration-300 ease-in-out"
+              style={{ width: itineraryExpanded ? 340 : 0 }}
+            >
+              <TimelinePanel />
+            </div>
+
+            {/* Middle toggle button */}
+            <button
+              onClick={() => setItineraryExpanded(prev => !prev)}
+              className="absolute -right-3.5 top-1/2 -translate-y-1/2 z-50 w-7 h-14 bg-card border border-border rounded-full flex items-center justify-center shadow-md hover:bg-secondary hover:border-primary/40 transition-all duration-200 cursor-pointer"
+            >
+              {itineraryExpanded ? (
+                <ChevronLeft className="w-4 h-4 text-primary" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-primary" />
+              )}
+            </button>
+          </div>
+        )}
 
         <MapPanel />
 
