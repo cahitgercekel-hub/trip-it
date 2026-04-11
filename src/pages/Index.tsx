@@ -32,10 +32,6 @@ function PlannerLayout() {
             </div>
             <h1 className="text-lg font-bold text-foreground tracking-tight">Trip It!</h1>
           </div>
-          <div className="hidden sm:flex items-center gap-1.5 text-sm text-muted-foreground bg-secondary px-3 py-1 rounded-full">
-            <span>{flag}</span>
-            <span className="font-medium text-foreground">{selectedCity.name}</span>
-          </div>
         </div>
       </header>
 
