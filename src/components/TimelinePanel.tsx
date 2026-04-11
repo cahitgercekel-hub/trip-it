@@ -67,7 +67,36 @@ export function TimelinePanel() {
             </button>
           </div>
 
-          {/* Walking preference hint */}
+          {/* Weather section */}
+          <div className="mb-4">
+            {weatherLoading ? (
+              <div className="rounded-lg p-3 bg-secondary/50 border border-border/50 animate-pulse">
+                <div className="h-4 w-24 bg-muted rounded mb-2" />
+                <div className="h-6 w-16 bg-muted rounded" />
+              </div>
+            ) : weather ? (
+              <div className={`rounded-lg p-3 bg-gradient-to-br ${
+                weather.code >= 71 ? 'from-blue-900 to-slate-900' :
+                weather.code >= 51 ? 'from-rose-950 to-slate-900' :
+                weather.code >= 3 ? 'from-slate-700 to-slate-900' :
+                'from-sky-800 to-slate-900'
+              } text-primary-foreground`}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium opacity-90">{selectedCity.name}</span>
+                  <span className="text-lg">{weather.icon}</span>
+                </div>
+                <div className="flex items-baseline gap-1.5 mb-0.5">
+                  <span className="text-xl font-bold">{weather.temp}°C</span>
+                  <span className="text-[11px] opacity-70">{weather.label}</span>
+                </div>
+                <div className="flex items-center gap-3 text-[10px] opacity-65 mt-1">
+                  <span className="flex items-center gap-1"><Wind className="w-2.5 h-2.5" /> {weather.windSpeed} km/h</span>
+                  <span className="flex items-center gap-1"><CloudRain className="w-2.5 h-2.5" /> {weather.precipitation} mm</span>
+                </div>
+              </div>
+            ) : null}
+          </div>
+
           <div className="mb-4 flex items-start gap-2 bg-secondary/50 border border-border/50 rounded-lg px-3 py-2">
             <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
             <p className="text-[10px] text-muted-foreground leading-relaxed">
