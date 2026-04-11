@@ -75,12 +75,7 @@ export function TimelinePanel() {
                 <div className="h-6 w-16 bg-muted rounded" />
               </div>
             ) : weather ? (
-              <div className={`rounded-lg p-3 bg-gradient-to-br ${
-                weather.code >= 71 ? 'from-blue-900 to-slate-900' :
-                weather.code >= 51 ? 'from-rose-950 to-slate-900' :
-                weather.code >= 3 ? 'from-slate-700 to-slate-900' :
-                'from-sky-800 to-slate-900'
-              } text-primary-foreground`}>
+             
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-medium opacity-90">{selectedCity.name}</span>
                   <span className="text-lg">{weather.icon}</span>
