@@ -44,39 +44,22 @@ export function PlannerSidebar() {
   };
 
   return (
-    <motion.aside
-      animate={{ width: collapsed ? 52 : 280 }}
-      transition={springTransition}
-      className="relative h-full overflow-y-auto overflow-x-hidden bg-card border-r border-border flex flex-col gap-3 p-2"
-      style={{ minWidth: collapsed ? 52 : 280 }}
-    >
-      {/* Toggle button — expanded state */}
-      {!collapsed && (
-        <button
-          onClick={() => setCollapsed(true)}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 z-50 bg-secondary border border-border rounded-full w-6 h-6 flex items-center justify-center hover:border-primary/40 transition-colors"
-        >
-          <ChevronLeft className="w-3.5 h-3.5 text-foreground" />
-        </button>
-      )}
-
-      {/* Floating re-open tab — collapsed state */}
-      {collapsed && (
-        <motion.button
-          initial={{ opacity: 0, x: -4 }}
-          animate={{ opacity: 1, x: 0 }}
-          onClick={() => setCollapsed(false)}
-          className="fixed left-[52px] top-1/2 -translate-y-1/2 z-50 bg-card border border-border border-l-2 border-l-primary rounded-r-lg px-1.5 py-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-secondary hover:border-primary/30 hover:scale-[1.03] transition-all"
-        >
-          <ChevronRight className="w-3.5 h-3.5 text-primary" />
-          <span
-            className="text-[10px] text-muted-foreground font-medium tracking-wider"
-            style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+    <>
+      <motion.aside
+        animate={{ width: collapsed ? 52 : 280 }}
+        transition={springTransition}
+        className="relative h-full overflow-y-auto overflow-x-hidden bg-card border-r border-border flex flex-col gap-3 p-2"
+        style={{ minWidth: collapsed ? 52 : 280 }}
+      >
+        {/* Toggle button — expanded state */}
+        {!collapsed && (
+          <button
+            onClick={() => setCollapsed(true)}
+            className="absolute -right-3 top-1/2 -translate-y-1/2 z-50 bg-secondary border border-border rounded-full w-6 h-6 flex items-center justify-center hover:border-primary/40 transition-colors"
           >
-            Menu
-          </span>
-        </motion.button>
-      )}
+            <ChevronLeft className="w-3.5 h-3.5 text-foreground" />
+          </button>
+        )}
 
       <TooltipProvider delayDuration={200}>
         {/* Weather */}
