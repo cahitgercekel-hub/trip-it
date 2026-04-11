@@ -135,13 +135,16 @@ export function PlannerSidebar() {
           </SidebarCard>
         )}
 
-        {/* Stats */}
-        {!collapsed && (
-          <motion.div {...fadeProps} className="grid grid-cols-2 gap-2">
-            <StatCard icon={<MapPin className="w-4 h-4 text-primary" />} label="POIs" value={stats.poiCount.toString()} />
-            <StatCard icon={<Wallet className="w-4 h-4 text-action" />} label="Cost" value={`€${stats.cost}`} />
-            <StatCard icon={<Footprints className="w-4 h-4 text-nature" />} label="Steps" value={stats.steps.toLocaleString()} />
-            <StatCard icon={<Route className="w-4 h-4 text-culture" />} label="Distance" value={`${stats.distance.toFixed(1)}km`} />
+        {/* Weather & Packing + Cost Estimation */}
+        {collapsed ? (
+          <>
+            <CollapsedIcon icon={<Shirt className="w-4 h-4" />} label="Weather & Packing" />
+            <CollapsedIcon icon={<Wallet className="w-4 h-4" />} label="Cost Estimation" />
+          </>
+        ) : (
+          <motion.div {...fadeProps} className="flex flex-col gap-3">
+            <WeatherPackingCard />
+            <CostEstimationCard />
           </motion.div>
         )}
       </TooltipProvider>
