@@ -1,28 +1,23 @@
 import { usePlanner } from '@/context/PlannerContext';
+import { CITIES_DATA, City } from '@/data/cities';
 import { MapPin, Search } from 'lucide-react';
 import { useState, useMemo, useRef, useEffect } from 'react';
 
 export function HeadingToCard() {
-  const { cities, cityId, setCityId, setCountry, selectedCity, country } = usePlanner();
+  const { cityId, setCityId, setCountry, selectedCity, country } = usePlanner();
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Import all cities for search
-  const allCities = useMemo(() => {
-    const { CITIES_DATA } = require('@/data/cities');
-    return CITIES_DATA as import('@/data/cities').City[];
-  }, []);
-
   const filtered = useMemo(() => {
-    if (!query.trim()) return allCities;
+    if (!query.trim()) return CITIES_DATA;
     const q = query.toLowerCase();
-    return allCities.filter(c =>
+    return CITIES_DATA.filter(c =>
       c.name.toLowerCase().includes(q) ||
       c.country.toLowerCase().includes(q) ||
       (c.country === 'DE' ? 'germany' : 'austria').includes(q)
     );
-  }, [query, allCities]);
+  }, [query]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -34,14 +29,13 @@ export function HeadingToCard() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const handleSelect = (city: import('@/data/cities').City) => {
+  const handleSelect = (city: City) => {
     if (city.country !== country) setCountry(city.country);
     setCityId(city.id);
     setQuery('');
     setOpen(false);
   };
 
-  const displayValue = query || '';
   const placeholder = selectedCity
     ? `${selectedCity.country === 'DE' ? 'Germany' : 'Austria'} / ${selectedCity.name}`
     : 'Country / City / Landmark';
@@ -57,7 +51,7 @@ export function HeadingToCard() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
         <input
           type="text"
-          value={displayValue}
+          value={query}
           onChange={e => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
           placeholder={placeholder}

@@ -245,20 +245,6 @@ function SidebarCard({ title, children }: { title: string; children: React.React
   );
 }
 
-function PillButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all shadow-pill ${
-        active
-          ? 'bg-primary text-primary-foreground shadow-card-hover'
-          : 'bg-background text-muted-foreground hover:text-foreground hover:bg-secondary'
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
 
 function ToggleRow({ icon, label, checked, onChange, disabled }: {
   icon: React.ReactNode; label: string; checked: boolean; onChange: (b: boolean) => void; disabled?: boolean
