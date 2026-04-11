@@ -1,7 +1,7 @@
 import { usePlanner } from '@/context/PlannerContext';
 import { haversine } from '@/lib/planner';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Landmark, TreePine, Droplets, TrainFront, Ticket } from 'lucide-react';
+import { Landmark, TreePine, Droplets, TrainFront, Ticket, X } from 'lucide-react';
 import type { POI } from '@/data/cities';
 
 interface TimelineEntry {
@@ -13,7 +13,7 @@ interface TimelineEntry {
 }
 
 export function TimelinePanel() {
-  const { filteredPois, stepGoal, dTicketMode, isicActive } = usePlanner();
+  const { filteredPois, stepGoal, dTicketMode, isicActive, rainyFilter, setRainyFilter, selectedCity } = usePlanner();
 
   const gapCount = Math.max(filteredPois.length - 1, 1);
   const stepsPerGap = stepGoal / gapCount;
@@ -45,6 +45,32 @@ export function TimelinePanel() {
         <h2 className="text-base font-bold text-foreground">Your Itinerary</h2>
         <p className="text-xs text-muted-foreground mt-0.5">{filteredPois.length} stops · Starting at 09:00</p>
       </div>
+
+      {/* Rainy weather banner */}
+      <AnimatePresence>
+        {rainyFilter && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-4"
+          >
+            <div className="bg-danger-light border border-danger/20 rounded-lg px-4 py-2.5 flex items-start justify-between gap-2">
+              <p className="text-xs text-foreground leading-relaxed">
+                <span className="font-semibold">⛈️ Rainy weather detected in {selectedCity.name}</span>
+                <br />
+                <span className="text-muted-foreground">Showing indoor spots only.</span>
+              </p>
+              <button
+                onClick={() => setRainyFilter(false)}
+                className="shrink-0 mt-0.5 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence mode="popLayout">
         {entries.map((entry, i) => (
@@ -161,6 +187,5 @@ function getDotStyle(entry: TimelineEntry) {
 function getCardStyle(entry: TimelineEntry) {
   if (entry.type === 'refill') return 'bg-info-light border-info/20';
   if (entry.type === 'warning') return 'bg-warning-light border-warning/20';
-  if (entry.poi?.category === 'Culture') return 'bg-card border-border shadow-card';
   return 'bg-card border-border shadow-card';
 }

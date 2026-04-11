@@ -1,17 +1,23 @@
 import { usePlanner } from '@/context/PlannerContext';
+import { useWeather } from '@/hooks/useWeather';
 import { motion } from 'framer-motion';
-import { MapPin, Wallet, Footprints, Route, Train, Ticket, GraduationCap, Sparkles } from 'lucide-react';
+import { MapPin, Wallet, Footprints, Route, Train, Ticket, GraduationCap, Wind, CloudRain } from 'lucide-react';
 
 export function PlannerSidebar() {
   const {
     country, setCountry, cityId, setCityId, cities,
     stepGoal, setStepGoal, budget, setBudget,
     dTicketMode, setDTicketMode, freeOnly, setFreeOnly,
-    isicActive, setIsicActive, planB, togglePlanB, stats,
+    isicActive, setIsicActive, stats, selectedCity,
   } = usePlanner();
+
+  const { weather, loading, error } = useWeather(selectedCity.center[0], selectedCity.center[1]);
 
   return (
     <aside className="w-[280px] min-w-[280px] h-screen overflow-y-auto bg-card border-r border-border flex flex-col gap-3 p-4">
+      {/* Weather card — top of sidebar */}
+      <WeatherCard cityName={selectedCity.name} weather={weather} loading={loading} error={error} />
+
       {/* Country filter */}
       <SidebarCard title="Country">
         <div className="flex gap-2">
@@ -99,21 +105,6 @@ export function PlannerSidebar() {
         </div>
       </SidebarCard>
 
-      {/* Plan B */}
-      <motion.button
-        whileHover={{ scale: 1.015, y: -1 }}
-        whileTap={{ scale: 0.985 }}
-        onClick={togglePlanB}
-        className={`w-full py-3 rounded-lg font-semibold text-sm shadow-card transition-all flex items-center justify-center gap-2 ${
-          planB
-            ? 'bg-action text-action-foreground'
-            : 'bg-primary text-primary-foreground'
-        }`}
-      >
-        <Sparkles className="w-4 h-4" />
-        {planB ? '☀️ Back to Plan A' : '☁️ Plan B: Rainy Day'}
-      </motion.button>
-
       {/* Stats */}
       <div className="grid grid-cols-2 gap-2">
         <StatCard icon={<MapPin className="w-4 h-4 text-primary" />} label="POIs" value={stats.poiCount.toString()} />
@@ -125,6 +116,67 @@ export function PlannerSidebar() {
   );
 }
 
+/* ─── Weather Card ─── */
+function getWeatherGradient(code: number): string {
+  if (code >= 71 && code <= 77) return 'from-blue-900 to-slate-900'; // Snow
+  if (code >= 51) return 'from-rose-950 to-slate-900'; // Rain/Storm
+  if (code >= 3 && code <= 48) return 'from-slate-700 to-slate-900'; // Cloudy/Fog
+  return 'from-sky-800 to-slate-900'; // Clear
+}
+
+interface WeatherCardProps {
+  cityName: string;
+  weather: import('@/hooks/useWeather').WeatherData | null;
+  loading: boolean;
+  error: boolean;
+}
+
+function WeatherCard({ cityName, weather, loading, error }: WeatherCardProps) {
+  if (loading) {
+    return (
+      <div className="rounded-lg p-4 bg-gradient-to-br from-slate-700 to-slate-900 animate-pulse">
+        <div className="h-4 w-24 bg-slate-600 rounded mb-3" />
+        <div className="h-8 w-20 bg-slate-600 rounded mb-3" />
+        <div className="h-3 w-36 bg-slate-600 rounded" />
+      </div>
+    );
+  }
+
+  if (error || !weather) {
+    return (
+      <div className="rounded-lg p-3 bg-secondary border border-border text-center">
+        <p className="text-xs text-muted-foreground">Weather unavailable</p>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`rounded-lg p-4 bg-gradient-to-br ${getWeatherGradient(weather.code)} text-primary-foreground`}
+    >
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-sm font-medium opacity-90">{cityName}</span>
+        <span className="text-2xl">{weather.icon}</span>
+      </div>
+      <div className="flex items-baseline gap-2 mb-1">
+        <span className="text-3xl font-bold">{weather.temp}°C</span>
+      </div>
+      <p className="text-xs opacity-80 mb-2">{weather.label}</p>
+      <div className="flex items-center gap-4 text-xs opacity-75">
+        <span className="flex items-center gap-1">
+          <Wind className="w-3 h-3" /> {weather.windSpeed} km/h
+        </span>
+        <span className="flex items-center gap-1">
+          <CloudRain className="w-3 h-3" /> {weather.precipitation} mm
+        </span>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ─── Shared sub-components ─── */
 function SidebarCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="bg-card border border-border rounded-lg p-3 shadow-card">

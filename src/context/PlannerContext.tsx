@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode, useMemo } from 'react';
 import { CITIES_DATA, City, POI } from '@/data/cities';
-import { haversine, getTotalDistance, getTotalSteps, getEstimatedCost } from '@/lib/planner';
+import { getTotalDistance, getTotalSteps, getEstimatedCost } from '@/lib/planner';
 
 interface PlannerState {
   country: 'DE' | 'AT';
@@ -10,7 +10,7 @@ interface PlannerState {
   dTicketMode: boolean;
   freeOnly: boolean;
   isicActive: boolean;
-  planB: boolean;
+  rainyFilter: boolean;
   mapFilter: 'All' | 'Culture' | 'Nature';
 }
 
@@ -22,7 +22,7 @@ interface PlannerContextType extends PlannerState {
   setDTicketMode: (b: boolean) => void;
   setFreeOnly: (b: boolean) => void;
   setIsicActive: (b: boolean) => void;
-  togglePlanB: () => void;
+  setRainyFilter: (b: boolean) => void;
   setMapFilter: (f: 'All' | 'Culture' | 'Nature') => void;
   cities: City[];
   selectedCity: City;
@@ -46,7 +46,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const [dTicketMode, setDTicketMode] = useState(false);
   const [freeOnly, setFreeOnly] = useState(false);
   const [isicActive, setIsicActive] = useState(false);
-  const [planB, setPlanB] = useState(false);
+  const [rainyFilter, setRainyFilter] = useState(false);
   const [mapFilter, setMapFilter] = useState<'All' | 'Culture' | 'Nature'>('All');
 
   const setCountry = (c: 'DE' | 'AT') => {
@@ -62,8 +62,8 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const filteredPois = useMemo(() => {
     let pois = selectedCity.pois;
 
-    // Plan B: swap Nature → Culture
-    if (planB) {
+    // Rainy weather: filter out Nature POIs
+    if (rainyFilter) {
       pois = pois.filter(p => p.category === 'Culture');
     }
 
@@ -78,7 +78,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     if (mapFilter !== 'All') pois = pois.filter(p => p.category === mapFilter);
 
     return pois;
-  }, [selectedCity, planB, freeOnly, dTicketMode, country, budget, isicActive, mapFilter]);
+  }, [selectedCity, rainyFilter, freeOnly, dTicketMode, country, budget, isicActive, mapFilter]);
 
   const stats = useMemo(() => ({
     poiCount: filteredPois.length,
@@ -89,9 +89,9 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
 
   return (
     <PlannerContext.Provider value={{
-      country, cityId, stepGoal, budget, dTicketMode, freeOnly, isicActive, planB, mapFilter,
+      country, cityId, stepGoal, budget, dTicketMode, freeOnly, isicActive, rainyFilter, mapFilter,
       setCountry, setCityId, setStepGoal, setBudget, setDTicketMode, setFreeOnly, setIsicActive,
-      togglePlanB: () => setPlanB(p => !p), setMapFilter,
+      setRainyFilter, setMapFilter,
       cities, selectedCity, filteredPois, stats,
     }}>
       {children}

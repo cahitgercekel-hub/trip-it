@@ -1,14 +1,25 @@
+import { useEffect } from 'react';
 import { PlannerProvider, usePlanner } from '@/context/PlannerContext';
 import { PlannerSidebar } from '@/components/PlannerSidebar';
 import { TimelinePanel } from '@/components/TimelinePanel';
 import { MapPanel } from '@/components/MapPanel';
+import { useWeather } from '@/hooks/useWeather';
 import { useState } from 'react';
 import { Menu, X, MapPin } from 'lucide-react';
 
 function PlannerLayout() {
-  const { selectedCity, country } = usePlanner();
+  const { selectedCity, country, setRainyFilter } = usePlanner();
   const [mobileOpen, setMobileOpen] = useState(false);
   const flag = country === 'DE' ? '🇩🇪' : '🇦🇹';
+
+  const { weather } = useWeather(selectedCity.center[0], selectedCity.center[1]);
+
+  // Auto-enable rainy filter when weather is rainy
+  useEffect(() => {
+    if (weather) {
+      setRainyFilter(weather.isRainy);
+    }
+  }, [weather, setRainyFilter]);
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -27,6 +38,11 @@ function PlannerLayout() {
           <div className="hidden sm:flex items-center gap-1.5 text-sm text-muted-foreground bg-secondary px-3 py-1 rounded-full">
             <span>{flag}</span>
             <span className="font-medium text-foreground">{selectedCity.name}</span>
+            {weather && (
+              <span className="flex items-center gap-1 ml-1 text-foreground">
+                {weather.icon} {weather.temp}°C
+              </span>
+            )}
           </div>
         </div>
       </header>
