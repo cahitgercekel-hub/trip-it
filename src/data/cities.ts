@@ -18,6 +18,7 @@ export interface City {
   country: 'DE' | 'AT';
   center: [number, number];
   zoom: number;
+  airportIATA: string;
   pois: POI[];
 }
 
