@@ -45,7 +45,7 @@ export function MapPanel() {
   }, [tripGenerated, filteredPois]);
 
   return (
-    <div className="flex-1 h-screen relative">
+    <div className="flex-1 h-screen relative z-10">
       {/* Top bar */}
       <div className="absolute top-3 left-3 right-3 z-[1000] flex flex-col gap-2">
         <TripInterestsBar />
