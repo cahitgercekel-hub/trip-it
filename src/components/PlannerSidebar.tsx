@@ -1,9 +1,8 @@
 import { usePlanner } from '@/context/PlannerContext';
-import { useWeather } from '@/hooks/useWeather';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Footprints, Train, Ticket, GraduationCap,
-  Wind, CloudRain, Wallet, ArrowLeft,
+  Footprints, Train, Ticket, GraduationCap, Wallet, ArrowLeft,
 } from 'lucide-react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { HeadingToCard } from '@/components/sidebar/HeadingToCard';
@@ -28,7 +27,7 @@ export function PlannerSidebar() {
     tripGenerated, setTripGenerated, tripLoading, generateTrip,
   } = usePlanner();
 
-  const { weather, loading, error } = useWeather(selectedCity.center[0], selectedCity.center[1]);
+  
 
   const fadeProps = {
     animate: { opacity: 1 },
@@ -109,8 +108,6 @@ export function PlannerSidebar() {
                 <span>Back to Search</span>
               </button>
 
-              {/* Weather */}
-              <WeatherCard cityName={selectedCity.name} weather={weather} loading={loading} error={error} />
 
               {/* Packing */}
               <WeatherPackingCard />
@@ -125,60 +122,6 @@ export function PlannerSidebar() {
   );
 }
 
-/* ─── Weather Card ─── */
-function getWeatherGradient(code: number): string {
-  if (code >= 71 && code <= 77) return 'from-blue-900 to-slate-900';
-  if (code >= 51) return 'from-rose-950 to-slate-900';
-  if (code >= 3 && code <= 48) return 'from-slate-700 to-slate-900';
-  return 'from-sky-800 to-slate-900';
-}
-
-interface WeatherCardProps {
-  cityName: string;
-  weather: import('@/hooks/useWeather').WeatherData | null;
-  loading: boolean;
-  error: boolean;
-}
-
-function WeatherCard({ cityName, weather, loading, error }: WeatherCardProps) {
-  if (loading) {
-    return (
-      <div className="rounded-lg p-4 bg-gradient-to-br from-slate-700 to-slate-900 animate-pulse">
-        <div className="h-4 w-24 bg-slate-600 rounded mb-3" />
-        <div className="h-8 w-20 bg-slate-600 rounded mb-3" />
-        <div className="h-3 w-36 bg-slate-600 rounded" />
-      </div>
-    );
-  }
-  if (error || !weather) {
-    return (
-      <div className="rounded-lg p-3 bg-secondary border border-border text-center">
-        <p className="text-xs text-muted-foreground">Weather unavailable</p>
-      </div>
-    );
-  }
-  const gradient = getWeatherGradient(weather.code);
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`rounded-xl p-4 bg-gradient-to-br ${gradient} text-primary-foreground shadow-card`}
-    >
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-sm font-medium opacity-90">{cityName}</span>
-        <span className="text-2xl">{weather.icon}</span>
-      </div>
-      <div className="flex items-baseline gap-2 mb-1">
-        <span className="text-3xl font-bold">{weather.temp}°C</span>
-      </div>
-      <p className="text-xs opacity-80 mb-2">{weather.label}</p>
-      <div className="flex items-center gap-4 text-xs opacity-75">
-        <span className="flex items-center gap-1"><Wind className="w-3 h-3" /> {weather.windSpeed} km/h</span>
-        <span className="flex items-center gap-1"><CloudRain className="w-3 h-3" /> {weather.precipitation} mm</span>
-      </div>
-    </motion.div>
-  );
-}
 
 /* ─── Shared sub-components ─── */
 function SidebarCard({ title, children }: { title: string; children: React.ReactNode }) {
