@@ -3,27 +3,14 @@ import { useWeather } from '@/hooks/useWeather';
 import { motion } from 'framer-motion';
 import {
   Footprints, Train, Ticket, GraduationCap,
-  Wind, CloudRain, ChevronLeft, ChevronRight, CalendarDays, Search,
-  Wallet, Shirt, Compass,
+  Wind, CloudRain, Wallet,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { HeadingToCard } from '@/components/sidebar/HeadingToCard';
 import { DatesCard } from '@/components/sidebar/DatesCard';
 import { WeatherPackingCard } from '@/components/sidebar/WeatherPackingCard';
 import { CostEstimationCard } from '@/components/sidebar/CostEstimationCard';
 import { TripInterestsCard } from '@/components/sidebar/TripInterestsCard';
-
-
-const STORAGE_KEY = 'tageplan_sidebar_collapsed';
-
-function getInitialCollapsed(): boolean {
-  try {
-    return localStorage.getItem(STORAGE_KEY) === 'true';
-  } catch {
-    return false;
-  }
-}
 
 export function PlannerSidebar() {
   const {
@@ -34,210 +21,87 @@ export function PlannerSidebar() {
   } = usePlanner();
 
   const { weather, loading, error } = useWeather(selectedCity.center[0], selectedCity.center[1]);
-  const [collapsed, setCollapsed] = useState(getInitialCollapsed);
 
-  useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY, String(collapsed)); } catch {}
-  }, [collapsed]);
-
-  const springTransition = { type: 'spring' as const, stiffness: 300, damping: 30 };
   const fadeProps = {
-    animate: { opacity: collapsed ? 0 : 1 },
+    animate: { opacity: 1 },
     transition: { duration: 0.15 },
   };
 
   return (
-    <>
-      <motion.aside
-        animate={{ width: collapsed ? 52 : 280 }}
-        transition={springTransition}
-        className="relative h-full overflow-y-auto overflow-x-hidden bg-card border-r border-border flex flex-col gap-3 p-2"
-        style={{ minWidth: collapsed ? 52 : 280 }}
-      >
-        {/* Toggle button — expanded state */}
-        {!collapsed && (
-          <button
-            onClick={() => setCollapsed(true)}
-            className="absolute -right-3 top-1/2 -translate-y-1/2 z-50 bg-secondary border border-border rounded-full w-6 h-6 flex items-center justify-center hover:border-primary/40 transition-colors"
-          >
-            <ChevronLeft className="w-3.5 h-3.5 text-foreground" />
-          </button>
-        )}
-
+    <div className="flex flex-col gap-3 p-3">
       <TooltipProvider delayDuration={200}>
         {/* Weather */}
-        {collapsed ? (
-          <CollapsedWeather weather={weather} loading={loading} error={error} />
-        ) : (
-          <WeatherCard cityName={selectedCity.name} weather={weather} loading={loading} error={error} />
-        )}
-
+        <WeatherCard cityName={selectedCity.name} weather={weather} loading={loading} error={error} />
 
         {/* Heading To + Dates */}
-        {collapsed ? (
-          <>
-            <CollapsedIcon icon={<Search className="w-4 h-4" />} label="Heading to" />
-            <CollapsedIcon icon={<CalendarDays className="w-4 h-4" />} label="Dates" />
-          </>
-        ) : (
-          <motion.div {...fadeProps} className="flex flex-col gap-3">
-            <HeadingToCard />
-            <DatesCard />
-          </motion.div>
-        )}
+        <HeadingToCard />
+        <DatesCard />
 
         {/* Trip Interests */}
-        {collapsed ? (
-          <CollapsedIcon icon={<Compass className="w-4 h-4" />} label="Trip Interests" />
-        ) : (
-          <motion.div {...fadeProps}>
-            <TripInterestsCard />
-          </motion.div>
-        )}
+        <TripInterestsCard />
 
         {/* Step Goal */}
-        {collapsed ? (
-          <CollapsedIcon icon={<Footprints className="w-4 h-4" />} label="Step Goal" />
-        ) : (
-          <SidebarCard title="Step Goal">
-            <motion.div {...fadeProps}>
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <Footprints className="w-3.5 h-3.5" />
-                  <span className="text-xs">Daily target</span>
-                </div>
-                <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">{stepGoal.toLocaleString()}</span>
+        <SidebarCard title="Step Goal">
+          <motion.div {...fadeProps}>
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <Footprints className="w-3.5 h-3.5" />
+                <span className="text-xs">Daily target</span>
               </div>
-              <input type="range" min={3000} max={20000} step={500} value={stepGoal} onChange={e => setStepGoal(Number(e.target.value))} className="w-full sidebar-range" style={{ '--range-progress': `${((stepGoal - 3000) / (20000 - 3000)) * 100}%` } as React.CSSProperties} />
-              <div className="flex justify-between text-[10px] text-muted-foreground mt-1"><span>3,000</span><span>20,000</span></div>
-            </motion.div>
-          </SidebarCard>
-        )}
+              <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">{stepGoal.toLocaleString()}</span>
+            </div>
+            <input type="range" min={3000} max={20000} step={500} value={stepGoal} onChange={e => setStepGoal(Number(e.target.value))} className="w-full sidebar-range" style={{ '--range-progress': `${((stepGoal - 3000) / (20000 - 3000)) * 100}%` } as React.CSSProperties} />
+            <div className="flex justify-between text-[10px] text-muted-foreground mt-1"><span>3,000</span><span>20,000</span></div>
+          </motion.div>
+        </SidebarCard>
 
         {/* Budget */}
-        {collapsed ? (
-          <CollapsedIcon icon={<Wallet className="w-4 h-4" />} label="Max Budget" />
-        ) : (
-          <SidebarCard title="Max Budget">
-            <motion.div {...fadeProps}>
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <Wallet className="w-3.5 h-3.5" />
-                  <span className="text-xs">Per attraction</span>
-                </div>
-                <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">€{budget}</span>
+        <SidebarCard title="Max Budget">
+          <motion.div {...fadeProps}>
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <Wallet className="w-3.5 h-3.5" />
+                <span className="text-xs">Per attraction</span>
               </div>
-              <input type="range" min={0} max={300} step={5} value={budget} onChange={e => setBudget(Number(e.target.value))} className="w-full sidebar-range" style={{ '--range-progress': `${(budget / 300) * 100}%` } as React.CSSProperties} />
-              <div className="flex justify-between text-[10px] text-muted-foreground mt-1"><span>€0</span><span>€300</span></div>
-            </motion.div>
-          </SidebarCard>
-        )}
+              <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">€{budget}</span>
+            </div>
+            <input type="range" min={0} max={300} step={5} value={budget} onChange={e => setBudget(Number(e.target.value))} className="w-full sidebar-range" style={{ '--range-progress': `${(budget / 300) * 100}%` } as React.CSSProperties} />
+            <div className="flex justify-between text-[10px] text-muted-foreground mt-1"><span>€0</span><span>€300</span></div>
+          </motion.div>
+        </SidebarCard>
 
         {/* Filters */}
-        {collapsed ? (
-          <div className="flex flex-col items-center gap-2">
-            <CollapsedIcon icon={<Train className="w-4 h-4" />} label="D-Ticket Mode" />
-            <CollapsedIcon icon={<Ticket className="w-4 h-4" />} label="Free Only" />
-            <CollapsedIcon icon={<GraduationCap className="w-4 h-4" />} label="ISIC Discounts" />
-          </div>
-        ) : (
-          <SidebarCard title="Filters">
-            <motion.div {...fadeProps} className="flex flex-col gap-1">
-              <ToggleRow icon={<Train className="w-3.5 h-3.5" />} label="D-Ticket Mode" checked={dTicketMode} onChange={setDTicketMode} disabled={country === 'AT'} />
-              {country === 'AT' && <p className="text-[11px] text-warning pl-5 -mt-0.5 mb-1">D-Ticket is not valid in Austria 🇦🇹</p>}
-              <ToggleRow icon={<Ticket className="w-3.5 h-3.5" />} label="Free Only" checked={freeOnly} onChange={setFreeOnly} />
-              <ToggleRow icon={<GraduationCap className="w-3.5 h-3.5" />} label="ISIC Discounts" checked={isicActive} onChange={setIsicActive} />
-            </motion.div>
-          </SidebarCard>
-        )}
+        <SidebarCard title="Filters">
+          <motion.div {...fadeProps} className="flex flex-col gap-1">
+            <ToggleRow icon={<Train className="w-3.5 h-3.5" />} label="D-Ticket Mode" checked={dTicketMode} onChange={setDTicketMode} disabled={country === 'AT'} />
+            {country === 'AT' && <p className="text-[11px] text-warning pl-5 -mt-0.5 mb-1">D-Ticket is not valid in Austria 🇦🇹</p>}
+            <ToggleRow icon={<Ticket className="w-3.5 h-3.5" />} label="Free Only" checked={freeOnly} onChange={setFreeOnly} />
+            <ToggleRow icon={<GraduationCap className="w-3.5 h-3.5" />} label="ISIC Discounts" checked={isicActive} onChange={setIsicActive} />
+          </motion.div>
+        </SidebarCard>
 
         {/* Trip It! Button */}
-        {!collapsed && (
-          <motion.div {...fadeProps}>
-            <button
-              onClick={() => setTripGenerated(true)}
-              className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold text-sm shadow-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
-            >
-              🚀 Trip It!
-            </button>
-          </motion.div>
-        )}
+        <button
+          onClick={() => setTripGenerated(true)}
+          className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold text-sm shadow-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
+        >
+          🚀 Trip It!
+        </button>
 
         {/* Weather & Packing + Cost Estimation — only after Trip It! */}
         {tripGenerated && (
-          collapsed ? (
-            <>
-              <CollapsedIcon icon={<Shirt className="w-4 h-4" />} label="Weather & Packing" />
-              <CollapsedIcon icon={<Wallet className="w-4 h-4" />} label="Cost Estimation" />
-            </>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="flex flex-col gap-3"
-            >
-              <WeatherPackingCard />
-              <CostEstimationCard />
-            </motion.div>
-          )
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex flex-col gap-3"
+          >
+            <WeatherPackingCard />
+            <CostEstimationCard />
+          </motion.div>
         )}
       </TooltipProvider>
-    </motion.aside>
-
-    {/* Floating re-open tab — rendered outside aside to avoid overflow clipping */}
-    {collapsed && (
-      <motion.button
-        initial={{ opacity: 0, x: -4 }}
-        animate={{ opacity: 1, x: 0 }}
-        onClick={() => setCollapsed(false)}
-        className="fixed left-[52px] top-1/2 -translate-y-1/2 z-50 bg-card border border-border border-l-2 border-l-primary rounded-r-lg px-1.5 py-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-secondary hover:border-primary/30 hover:scale-[1.03] transition-all"
-      >
-        <ChevronRight className="w-3.5 h-3.5 text-primary" />
-        <span
-          className="text-[10px] text-muted-foreground font-medium tracking-wider"
-          style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
-        >
-          Menu
-        </span>
-      </motion.button>
-    )}
-    </>
-  );
-}
-
-/* ─── Collapsed icon with tooltip ─── */
-function CollapsedIcon({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div className="flex items-center justify-center w-full py-2 text-muted-foreground hover:text-foreground transition-colors cursor-default">
-          {icon}
-        </div>
-      </TooltipTrigger>
-      <TooltipContent side="right" className="bg-foreground text-background text-xs px-2 py-1">
-        {label}
-      </TooltipContent>
-    </Tooltip>
-  );
-}
-
-/* ─── Collapsed weather ─── */
-function CollapsedWeather({ weather, loading, error }: { weather: import('@/hooks/useWeather').WeatherData | null; loading: boolean; error: boolean }) {
-  if (loading) return <div className="flex items-center justify-center py-3"><div className="w-5 h-5 rounded-full bg-muted animate-pulse" /></div>;
-  if (error || !weather) return <div className="flex items-center justify-center py-2 text-muted-foreground text-xs">—</div>;
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div className="flex flex-col items-center gap-0.5 py-2 cursor-default">
-          <span className="text-lg">{weather.icon}</span>
-          <span className="text-xs font-bold text-foreground">{weather.temp}°</span>
-        </div>
-      </TooltipTrigger>
-      <TooltipContent side="right" className="bg-foreground text-background text-xs px-2 py-1">
-        {weather.label}
-      </TooltipContent>
-    </Tooltip>
+    </div>
   );
 }
 
@@ -304,7 +168,6 @@ function SidebarCard({ title, children }: { title: string; children: React.React
     </div>
   );
 }
-
 
 function ToggleRow({ icon, label, checked, onChange, disabled }: {
   icon: React.ReactNode; label: string; checked: boolean; onChange: (b: boolean) => void; disabled?: boolean
