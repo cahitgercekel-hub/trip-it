@@ -1,6 +1,14 @@
 import type { POI } from '@/data/cities';
 
-const API_BASE = 'http://localhost:8000';
+// Read from env so deployments can point at a real HTTPS backend.
+// Falls back to localhost only for local development.
+const RAW_API_BASE = (import.meta.env.VITE_ITINERARY_API_BASE as string | undefined) ?? 'http://localhost:8000';
+const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
+
+if (import.meta.env.PROD && API_BASE.startsWith('http://') && !/^http:\/\/localhost(:|$)/.test(API_BASE)) {
+  // eslint-disable-next-line no-console
+  console.warn('[api] Itinerary API base is plain HTTP in production — switch to HTTPS via VITE_ITINERARY_API_BASE.');
+}
 
 export interface ItineraryRequest {
   starting_location: string;
@@ -66,9 +74,22 @@ export function buildItineraryRequest(
 }
 
 export async function generateItinerary(request: ItineraryRequest): Promise<ItineraryResponse> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+
+  // Attach the current Supabase JWT (if a user is signed in) so the backend can
+  // authenticate the caller and prevent anonymous abuse.
+  try {
+    const { supabase } = await import('@/integrations/supabase/client');
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+  } catch {
+    // Auth client unavailable — proceed without token.
+  }
+
   const response = await fetch(`${API_BASE}/api/generate-itinerary`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(request),
   });
 
