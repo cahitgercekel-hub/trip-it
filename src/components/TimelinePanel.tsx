@@ -99,17 +99,27 @@ export function TimelinePanel() {
         <div className="prose prose-sm prose-invert max-w-none">
           <div className="text-xs text-foreground leading-relaxed whitespace-pre-wrap [&_strong]:font-bold [&_em]:italic">
             {aiItinerary.split('\n').map((line, i) => {
-              const boldRe = new RegExp('\\*\\*(.+?)\\*\\*', 'g');
-              const italicRe = new RegExp('\\*(.+?)\\*', 'g');
-              const formatted = line
-                .replace(boldRe, '<strong>$1</strong>')
-                .replace(italicRe, '<em>$1</em>');
+              // Safely render markdown-ish bold/italic without dangerouslySetInnerHTML.
+              // Split on **bold** first, then *italic*, building React nodes from plain
+              // text segments so any HTML in the AI response is rendered as text.
+              const renderItalic = (text: string, keyPrefix: string) => {
+                const parts = text.split(/\*(.+?)\*/g);
+                return parts.map((part, idx) =>
+                  idx % 2 === 1 ? <em key={`${keyPrefix}-i-${idx}`}>{part}</em> : part
+                );
+              };
+              const segments = line.split(/\*\*(.+?)\*\*/g).map((seg, idx) =>
+                idx % 2 === 1
+                  ? <strong key={`b-${idx}`}>{renderItalic(seg, `b-${idx}`)}</strong>
+                  : <span key={`t-${idx}`}>{renderItalic(seg, `t-${idx}`)}</span>
+              );
               return (
                 <p
                   key={i}
                   className={`mb-1 ${line.startsWith('*') ? 'pl-2 border-l-2 border-primary/30 ml-1' : ''}`}
-                  dangerouslySetInnerHTML={{ __html: formatted || '&nbsp;' }}
-                />
+                >
+                  {line.length === 0 ? '\u00a0' : segments}
+                </p>
               );
             })}
           </div>
