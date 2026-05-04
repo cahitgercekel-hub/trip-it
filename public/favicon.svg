@@ -1,0 +1,11 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" rx="40" fill="white"/>
+  <!-- Main Path/Route Line -->
+  <path d="M50 140C50 140 70 80 120 70C170 60 150 130 150 130" stroke="#3B82F6" stroke-width="12" stroke-linecap="round"/>
+  <!-- Location Pin Shape -->
+  <path d="M120 50C108.954 50 100 58.9543 100 70C100 81.0457 120 100 120 100C120 100 140 81.0457 140 70C140 58.9543 131.046 50 120 50Z" fill="#EF4444"/>
+  <!-- Pin Inner Hole -->
+  <circle cx="120" cy="70" r="5" fill="white"/>
+  <!-- Secondary Path Sparkle -->
+  <circle cx="50" cy="140" r="8" fill="#3B82F6"/>
+</svg>

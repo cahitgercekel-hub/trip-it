@@ -26,11 +26,24 @@ export function getTotalSteps(pois: POI[]): number {
   return Math.round(getTotalDistance(pois) * 1350);
 }
 
-export function getEstimatedCost(pois: POI[], isicActive: boolean): number {
-  return pois.reduce((sum, poi) => {
+export function getEstimatedCost(pois: POI[], isicActive: boolean, dTicketMode: boolean, days: number = 1): number {
+  // Realistically, a traveler visits 3-5 paid attractions per day.
+  // We'll sum the average costs of the filtered POIs, capped at 4 per day.
+  const maxPoisToSum = Math.max(1, Math.min(pois.length, days * 4));
+  
+  // Sort by price to get a "middle-ground" or "realistic high" estimate
+  const sortedPois = [...pois].sort((a, b) => b.price - a.price);
+  const poisToSum = sortedPois.slice(0, maxPoisToSum);
+
+  const attractionCost = poisToSum.reduce((sum, poi) => {
     const price = isicActive && poi.hasISIC ? poi.price * 0.5 : poi.price;
     return sum + price;
   }, 0);
+
+  const transitCost = (dTicketMode ? 0 : 9) * days;
+  const foodCost = 25 * days;
+
+  return attractionCost + transitCost + foodCost;
 }
 
 /* ─── Transport estimation ─── */
@@ -152,4 +165,37 @@ export function getTransportRecommendation(
     walkingAdjusted,
     walkingTag,
   };
+}
+
+/**
+ * Optimizes a list of POIs by finding a logical path using the Nearest Neighbor algorithm (TSP).
+ * Starting from the POI closest to the city center (or first provided).
+ */
+export function optimizeRouteTSP(pois: POI[]): POI[] {
+  if (pois.length <= 2) return pois;
+
+  const remaining = [...pois];
+  const optimized: POI[] = [];
+
+  // Start with the POI that is generally "first" (or closest to index 0)
+  let current = remaining.shift()!;
+  optimized.push(current);
+
+  while (remaining.length > 0) {
+    let closestIdx = 0;
+    let minDistance = Infinity;
+
+    for (let i = 0; i < remaining.length; i++) {
+      const dist = haversine(current.lat, current.lng, remaining[i].lat, remaining[i].lng);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestIdx = i;
+      }
+    }
+
+    current = remaining.splice(closestIdx, 1)[0];
+    optimized.push(current);
+  }
+
+  return optimized;
 }

@@ -1,16 +1,18 @@
 import { usePlanner } from '@/context/PlannerContext';
 import { motion } from 'framer-motion';
 import { Wallet, Sparkles, Home, Train, Utensils, Ticket, ShoppingBag } from 'lucide-react';
+import { TranslationKey } from '@/lib/i18n';
 
 interface CostCategory {
   label: string;
+  key: TranslationKey;
   icon: React.ReactNode;
   amount: number;
   color: string; // tailwind bg class
 }
 
 export function CostEstimationCard() {
-  const { stats, filteredPois, isicActive, selectedCity } = usePlanner();
+  const { stats, isicActive, selectedCity, t } = usePlanner();
 
   // Derive cost breakdown from attractions + estimates
   const attractionCost = stats.cost;
@@ -24,22 +26,20 @@ export function CostEstimationCard() {
   const totalCost = attractionCost + accommodationCost + transportCost + foodCost + miscCost;
 
   const categories: CostCategory[] = [
-    { label: 'Accommodation', icon: <Home className="w-3.5 h-3.5" />, amount: accommodationCost, color: 'bg-primary' },
-    { label: 'Transport', icon: <Train className="w-3.5 h-3.5" />, amount: transportCost, color: 'bg-nature' },
-    { label: 'Food', icon: <Utensils className="w-3.5 h-3.5" />, amount: foodCost, color: 'bg-action' },
-    { label: 'Attractions', icon: <Ticket className="w-3.5 h-3.5" />, amount: attractionCost, color: 'bg-culture' },
-    { label: 'Misc', icon: <ShoppingBag className="w-3.5 h-3.5" />, amount: miscCost, color: 'bg-muted-foreground' },
+    { label: t('accommodation'), key: 'accommodation', icon: <Home className="w-3.5 h-3.5" />, amount: accommodationCost, color: 'bg-primary' },
+    { label: t('transport'), key: 'transport', icon: <Train className="w-3.5 h-3.5" />, amount: transportCost, color: 'bg-nature' },
+    { label: t('food'), key: 'food', icon: <Utensils className="w-3.5 h-3.5" />, amount: foodCost, color: 'bg-action' },
+    { label: t('attractions'), key: 'attractions', icon: <Ticket className="w-3.5 h-3.5" />, amount: attractionCost, color: 'bg-culture' },
+    { label: t('misc'), key: 'misc', icon: <ShoppingBag className="w-3.5 h-3.5" />, amount: miscCost, color: 'bg-muted-foreground' },
   ];
 
   const maxCategory = categories.reduce((a, b) => a.amount > b.amount ? a : b, categories[0]);
 
-  // AI insight
+  // AI insight (Dynamic translation needed or simplified)
   const getInsight = () => {
-    if (totalCost === 0) return "Add some POIs to see your estimated budget breakdown! 🎯";
-    if (attractionCost === 0) return `Great picks! All free attractions — your ${selectedCity.name} trip budget goes to food & transport. 🎉`;
-    if (maxCategory.label === 'Food') return `Food is your biggest expense in ${selectedCity.name}. Consider local markets & bakeries for savings! 🥐`;
-    if (maxCategory.label === 'Accommodation') return `Accommodation is the top cost. Hostels or Airbnb could save you up to 40%! 🏠`;
-    return `Your ${selectedCity.name} day trip costs ~€${totalCost}. ${isicActive ? 'ISIC discounts are saving you money! 🎓' : 'Activate ISIC for student discounts! 🎓'}`;
+    if (totalCost === 0) return t('noPoisMatch');
+    if (attractionCost === 0) return `${selectedCity.name}: ${t('freeOnly')}`; // Simplified
+    return `~€${totalCost}. ${isicActive ? t('savingMoney') : ''}`;
   };
 
   return (
@@ -53,11 +53,11 @@ export function CostEstimationCard() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-base">💰</span>
-            <span className="text-sm font-bold text-foreground">Cost Estimation</span>
+            <span className="text-sm font-bold text-foreground">{t('costEstimation')}</span>
           </div>
           <span className="text-lg font-bold text-primary">€{totalCost}</span>
         </div>
-        <p className="text-[11px] text-muted-foreground">Estimated daily budget</p>
+        <p className="text-[11px] text-muted-foreground">{t('estDailyBudget')}</p>
       </div>
 
       {/* Horizontal bar chart */}
@@ -68,7 +68,7 @@ export function CostEstimationCard() {
             if (pct < 1) return null;
             return (
               <motion.div
-                key={cat.label}
+                key={cat.key}
                 initial={{ width: 0 }}
                 animate={{ width: `${pct}%` }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
@@ -84,7 +84,7 @@ export function CostEstimationCard() {
       {/* Category breakdown */}
       <div className="px-4 pb-2 space-y-1.5">
         {categories.map(cat => (
-          <div key={cat.label} className="flex items-center justify-between">
+          <div key={cat.key} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${cat.color}`} style={{ opacity: 0.85 }} />
               <span className="text-muted-foreground">{cat.icon}</span>

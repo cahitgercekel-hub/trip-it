@@ -35,15 +35,15 @@ export function FloatingPanel({ children }: { children: React.ReactNode }) {
 
   // Persist state
   useEffect(() => {
-    try { localStorage.setItem(POS_KEY, JSON.stringify(position)); } catch {}
+    try { localStorage.setItem(POS_KEY, JSON.stringify(position)); } catch (e) { console.warn('Failed to save position', e); }
   }, [position]);
 
   useEffect(() => {
-    try { localStorage.setItem(MIN_KEY, JSON.stringify(minimized)); } catch {}
+    try { localStorage.setItem(MIN_KEY, JSON.stringify(minimized)); } catch (e) { console.warn('Failed to save minimized state', e); }
   }, [minimized]);
 
   useEffect(() => {
-    try { localStorage.setItem(WIDTH_KEY, JSON.stringify(width)); } catch {}
+    try { localStorage.setItem(WIDTH_KEY, JSON.stringify(width)); } catch (e) { console.warn('Failed to save width', e); }
   }, [width]);
 
   const handleDragStop = (_e: DraggableEvent, data: DraggableData) => {

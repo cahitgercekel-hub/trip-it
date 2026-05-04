@@ -1,14 +1,19 @@
 import { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
-import { CITIES_DATA, City, POI } from '@/data/cities';
+import { CITIES_DATA, City, POI, getVisitMinutes } from '@/data/cities';
 import { buildItineraryRequest, generateItinerary } from '@/lib/api';
-import { getTotalDistance, getTotalSteps, getEstimatedCost } from '@/lib/planner';
+import { getTotalDistance, getTotalSteps, getEstimatedCost, optimizeRouteTSP } from '@/lib/planner';
+import { Language, TRANSLATIONS, TranslationKey } from '@/lib/i18n';
 
 function getStoredTime(key: string, fallback: string): string {
   try { return localStorage.getItem(key) || fallback; } catch { return fallback; }
 }
 
+function getStoredLang(): Language {
+  try { return (localStorage.getItem('tageplan_lang') as Language) || 'en'; } catch { return 'en'; }
+}
+
 interface PlannerState {
-  country: 'DE' | 'AT';
+  lang: Language;
   cityId: string;
   stepGoal: number;
   budget: number;
@@ -36,7 +41,8 @@ const LOADING_STEPS = [
 ];
 
 interface PlannerContextType extends PlannerState {
-  setCountry: (c: 'DE' | 'AT') => void;
+  setLang: (l: Language) => void;
+  t: (key: TranslationKey) => string;
   setCityId: (id: string) => void;
   setStepGoal: (n: number) => void;
   setBudget: (n: number) => void;
@@ -73,7 +79,7 @@ function timeToMinutes(t: string): number {
 }
 
 export function PlannerProvider({ children }: { children: ReactNode }) {
-  const [country, setCountryRaw] = useState<'DE' | 'AT'>('DE');
+  const [lang, setLangRaw] = useState<Language>(getStoredLang);
   const [cityId, setCityId] = useState('berlin');
   const [stepGoal, setStepGoal] = useState(8000);
   const [budget, setBudget] = useState(25);
@@ -89,15 +95,24 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const [dayEndTime, setDayEndTimeRaw] = useState(() => getStoredTime('tageplan_end_time', '21:00'));
   const [aiItinerary, setAiItinerary] = useState<string | null>(null);
 
+  const setLang = (l: Language) => {
+    setLangRaw(l);
+    try { localStorage.setItem('tageplan_lang', l); } catch (e) { console.warn('Failed to save language', e); }
+  };
+
+  const t = useCallback((key: TranslationKey) => {
+    return TRANSLATIONS[lang][key] || TRANSLATIONS['en'][key] || key;
+  }, [lang]);
+
   const setDayStartTime = (t: string) => {
     setDayStartTimeRaw(t);
-    try { localStorage.setItem('tageplan_start_time', t); } catch {}
+    try { localStorage.setItem('tageplan_start_time', t); } catch (e) { console.warn('Failed to save start time', e); }
     // Auto-fix end time if needed
     if (timeToMinutes(t) >= timeToMinutes(dayEndTime)) {
       const fixed = timeToMinutes(t) + 60;
       const fixedStr = `${String(Math.floor(fixed / 60)).padStart(2, '0')}:${String(fixed % 60).padStart(2, '0')}`;
       setDayEndTimeRaw(fixedStr);
-      try { localStorage.setItem('tageplan_end_time', fixedStr); } catch {}
+      try { localStorage.setItem('tageplan_end_time', fixedStr); } catch (e) { console.warn('Failed to save end time', e); }
     }
   };
 
@@ -106,10 +121,10 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       const fixed = timeToMinutes(dayStartTime) + 60;
       const fixedStr = `${String(Math.floor(fixed / 60)).padStart(2, '0')}:${String(fixed % 60).padStart(2, '0')}`;
       setDayEndTimeRaw(fixedStr);
-      try { localStorage.setItem('tageplan_end_time', fixedStr); } catch {}
+      try { localStorage.setItem('tageplan_end_time', fixedStr); } catch (e) { console.warn('Failed to save end time', e); }
     } else {
       setDayEndTimeRaw(t);
-      try { localStorage.setItem('tageplan_end_time', t); } catch {}
+      try { localStorage.setItem('tageplan_end_time', t); } catch (e) { console.warn('Failed to save end time', e); }
     }
   };
 
@@ -122,38 +137,59 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     );
   };
 
-  const setCountry = (c: 'DE' | 'AT') => {
-    setCountryRaw(c);
-    const firstCity = CITIES_DATA.find(city => city.country === c);
-    if (firstCity) setCityId(firstCity.id);
-    if (c === 'AT') setDTicketMode(false);
-  };
-
-  const cities = useMemo(() => CITIES_DATA.filter(c => c.country === country), [country]);
+  const cities = CITIES_DATA;
   const selectedCity = useMemo(() => CITIES_DATA.find(c => c.id === cityId) || CITIES_DATA[0], [cityId]);
 
   const filteredPois = useMemo(() => {
     let pois = selectedCity.pois;
     if (rainyFilter) pois = pois.filter(p => p.category === 'Culture');
     if (freeOnly) pois = pois.filter(p => p.isFree);
-    if (dTicketMode && country === 'DE') pois = pois.filter(p => p.dTicket);
+    if (dTicketMode) pois = pois.filter(p => p.dTicket);
     pois = pois.filter(p => {
       const price = isicActive && p.hasISIC ? p.price * 0.5 : p.price;
       return price <= budget;
     });
     if (tripInterests.length > 0) {
-      const categoryMap: Record<string, string> = { Culture: 'culture', Nature: 'nature' };
+      const categoryMap: Record<string, string> = {
+        'Culture': 'culture',
+        'Nature': 'nature',
+        'Food & Drink': 'food-drink',
+        'Entertainment': 'entertainment',
+        'Shopping': 'shopping',
+        'History': 'history',
+        'Nightlife': 'nightlife',
+        'Relaxation': 'relaxation',
+        'Family-Friendly': 'family',
+        'Hidden Gems': 'hidden-gems'
+      };
       pois = pois.filter(p => tripInterests.includes(categoryMap[p.category] || ''));
     }
-    return pois;
-  }, [selectedCity, rainyFilter, freeOnly, dTicketMode, country, budget, isicActive, tripInterests]);
+    return optimizeRouteTSP(pois);
+  }, [selectedCity, rainyFilter, freeOnly, dTicketMode, budget, isicActive, tripInterests]);
 
-  const stats = useMemo(() => ({
-    poiCount: filteredPois.length,
-    cost: Math.round(getEstimatedCost(filteredPois, isicActive)),
-    steps: getTotalSteps(filteredPois),
-    distance: getTotalDistance(filteredPois),
-  }), [filteredPois, isicActive]);
+  const stats = useMemo(() => {
+    // Calculate realistic days needed for the selected POIs
+    let tripDays = 1;
+    if (filteredPois.length > 0) {
+      let currentMins = dayStartMinutes;
+      filteredPois.forEach((poi) => {
+        const visit = getVisitMinutes(poi);
+        // Rough estimation: if POI + avg 20min transit overflows the day
+        if (currentMins + visit + 20 > (tripDays * 1440 - (1440 - dayEndMinutes))) {
+          tripDays++;
+          currentMins = (tripDays - 1) * 1440 + dayStartMinutes;
+        }
+        currentMins += visit + 20;
+      });
+    }
+
+    return {
+      poiCount: filteredPois.length,
+      cost: Math.round(getEstimatedCost(filteredPois, isicActive, dTicketMode, tripDays)),
+      steps: getTotalSteps(filteredPois),
+      distance: getTotalDistance(filteredPois),
+    };
+  }, [filteredPois, isicActive, dTicketMode, dayStartMinutes, dayEndMinutes]);
 
   const generateTrip = useCallback(async () => {
     if (tripLoading) return;
@@ -178,6 +214,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         dayEndTime,
         tripInterests,
         stepGoal,
+        lang,
       );
       const response = await generateItinerary(request);
       setAiItinerary(response.itinerary);
@@ -190,14 +227,15 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       setTripLoading(false);
       setTripGenerated(true);
     }
-  }, [tripLoading, selectedCity, filteredPois, dayStartTime, dayEndTime, tripInterests, stepGoal]);
+  }, [tripLoading, selectedCity, filteredPois, dayStartTime, dayEndTime, tripInterests, stepGoal, lang]);
 
   return (
     <PlannerContext.Provider value={{
-      country, cityId, stepGoal, budget, dTicketMode, freeOnly, isicActive, rainyFilter, tripInterests, tripGenerated, tripLoading, loadingStep,
+      lang, setLang, t,
+      cityId, stepGoal, budget, dTicketMode, freeOnly, isicActive, rainyFilter, tripInterests, tripGenerated, tripLoading, loadingStep,
       dayStartTime, dayEndTime, dayStartMinutes, dayEndMinutes,
       aiItinerary,
-      setCountry, setCityId, setStepGoal, setBudget, setDTicketMode, setFreeOnly, setIsicActive,
+      setCityId, setStepGoal, setBudget, setDTicketMode, setFreeOnly, setIsicActive,
       setRainyFilter, toggleTripInterest, setTripGenerated, generateTrip,
       setDayStartTime, setDayEndTime,
       loadingSteps: LOADING_STEPS,

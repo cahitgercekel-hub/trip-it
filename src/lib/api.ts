@@ -27,7 +27,6 @@ export interface ItineraryRequest {
     hasISIC: boolean;
     dTicket: boolean;
     estimatedSteps: number;
-    country: string;
   }[];
 }
 
@@ -43,9 +42,17 @@ export function buildItineraryRequest(
   dayEndTime: string,
   tripInterests: string[],
   stepGoal: number,
+  lang: string = 'en',
 ): ItineraryRequest {
   const pace = stepGoal >= 12000 ? 'Fast-paced' : stepGoal >= 7000 ? 'Moderate' : 'Relaxed';
-  const interests = tripInterests.map(i => i.charAt(0).toUpperCase() + i.slice(1)).join(', ');
+  
+  const isDe = lang === 'de';
+  const localGuideRole = isDe 
+    ? "WICHTIG: Handeln Sie als sachkundiger lokaler Reiseführer. Geben Sie für jeden Ort eine reichhaltige historische oder kulturelle Beschreibung in 2 Sätzen an. Wenn öffentliche Verkehrsmittel empfohlen werden, nennen Sie spezifische Liniennummern (z.B. 'U2' oder 'Bus 100'). ANTWORTEN SIE AUSSCHLIESSLICH AUF DEUTSCH."
+    : "IMPORTANT: Act as a knowledgeable local tour guide. For every location, provide a 2-sentence rich historical or cultural description including what makes it unique. If public transit is recommended between stops, mention specific realistic transit line numbers (e.g., 'Take U2' or 'Bus 100'). RESPOND ONLY IN ENGLISH.";
+
+  const interests = tripInterests.map(i => i.charAt(0).toUpperCase() + i.slice(1)).join(', ') + 
+    ". " + localGuideRole;
 
   // Use today's date as placeholder
   const today = new Date();
@@ -68,7 +75,6 @@ export function buildItineraryRequest(
       hasISIC: p.hasISIC,
       dTicket: p.dTicket,
       estimatedSteps: p.estimatedSteps,
-      country: p.country,
     })),
   };
 }

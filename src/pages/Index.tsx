@@ -5,11 +5,14 @@ import { TimelinePanel } from '@/components/TimelinePanel';
 import { MapPanel } from '@/components/MapPanel';
 import { TripLoadingOverlay } from '@/components/TripLoadingOverlay';
 import { useWeather } from '@/hooks/useWeather';
-import { Menu, X, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Menu, X, Globe, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { TutorialModal } from '@/components/TutorialModal';
 
-function PlannerLayout() {
-  const { selectedCity, country, setRainyFilter, tripGenerated } = usePlanner();
+import { LandingPage } from '@/components/LandingPage';
+
+function MapPage() {
+  const { selectedCity, setRainyFilter, tripGenerated } = usePlanner();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [itineraryExpanded, setItineraryExpanded] = useState(true);
 
@@ -32,10 +35,9 @@ function PlannerLayout() {
       <header className="h-14 min-h-[56px] flex items-center justify-between px-5 border-b border-border bg-card z-50">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-              <Globe className="w-4 h-4 text-primary-foreground" />
-            </div>
+            <img src="/logo.svg" alt="Trip It Logo" className="w-9 h-9" />
             <h1 className="text-lg font-bold text-foreground tracking-tight">Trip It!</h1>
+            <TutorialModal dark />
           </div>
         </div>
       </header>
@@ -114,6 +116,37 @@ function PlannerLayout() {
         </AnimatePresence>
       </div>
     </div>
+  );
+}
+
+function PlannerLayout() {
+  const { tripGenerated, tripLoading } = usePlanner();
+
+  return (
+    <AnimatePresence mode="wait">
+      {(!tripGenerated && !tripLoading) ? (
+        <motion.div 
+          key="landing"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <LandingPage />
+        </motion.div>
+      ) : (
+        <motion.div 
+          key="map"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="h-screen"
+        >
+          <MapPage />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

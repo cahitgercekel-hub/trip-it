@@ -3,65 +3,49 @@ import { usePlanner } from '@/context/PlannerContext';
 import { motion } from 'framer-motion';
 import { Shirt, Droplets, Sun, Umbrella, Wind, Footprints, Sparkles } from 'lucide-react';
 
-function getPackingSuggestions(weather: WeatherData) {
+function getPackingSuggestions(weather: WeatherData, lang: string) {
+  const isDe = lang === 'de';
   const clothing: string[] = [];
   const skincare: string[] = [];
   const notes: string[] = [];
 
   // Temperature-based clothing
   if (weather.temp <= 0) {
-    clothing.push('🧥 Heavy winter coat', '🧣 Scarf & gloves', '🧤 Warm hat');
+    clothing.push(isDe ? '🧥 Wintermantel' : '🧥 Heavy winter coat', isDe ? '🧣 Schal & Handschuhe' : '🧣 Scarf & gloves', isDe ? '🧤 Mütze' : '🧤 Warm hat');
   } else if (weather.temp <= 10) {
-    clothing.push('🧥 Warm jacket', '👖 Long pants', '🧣 Light scarf');
+    clothing.push(isDe ? '🧥 Warme Jacke' : '🧥 Warm jacket', isDe ? '👖 Lange Hose' : '👖 Long pants', isDe ? '🧣 Leichter Schal' : '🧣 Light scarf');
   } else if (weather.temp <= 18) {
-    clothing.push('🧥 Light jacket', '👕 Long sleeves', '👖 Jeans');
+    clothing.push(isDe ? '🧥 Leichte Jacke' : '🧥 Light jacket', isDe ? '👕 Langarmshirt' : '👕 Long sleeves', isDe ? '👖 Jeans' : '👖 Jeans');
   } else if (weather.temp <= 25) {
-    clothing.push('👕 T-shirt', '🩳 Shorts or light pants', '👟 Breathable shoes');
+    clothing.push(isDe ? '👕 T-Shirt' : '👕 T-shirt', isDe ? '🩳 Shorts/leichte Hose' : '🩳 Shorts or light pants', isDe ? '👟 Atmungsaktive Schuhe' : '👟 Breathable shoes');
   } else {
-    clothing.push('👕 Light tee', '🩳 Shorts', '🧢 Sun hat', '🕶️ Sunglasses');
+    clothing.push(isDe ? '👕 Leichtes Shirt' : '👕 Light tee', isDe ? '🩳 Shorts' : '🩳 Shorts', isDe ? '🧢 Sonnenhut' : '🧢 Sun hat', isDe ? '🕶️ Sonnenbrille' : '🕶️ Sunglasses');
   }
 
   // Weather-based notes
   if (weather.isRainy) {
-    notes.push('☂️ Bring an umbrella');
-    clothing.push('🧥 Waterproof layer');
+    notes.push(isDe ? '☂️ Regenschirm mitnehmen' : '☂️ Bring an umbrella');
+    clothing.push(isDe ? '🧥 Regenjacke' : '🧥 Waterproof layer');
   }
   if (weather.windSpeed > 25) {
-    notes.push('💨 Windy — secure loose items');
+    notes.push(isDe ? '💨 Windig — lose Gegenstände sichern' : '💨 Windy — secure loose items');
   }
   if (weather.temp > 22 && !weather.isRainy) {
-    skincare.push('🧴 Sunscreen SPF 30+');
-    skincare.push('💧 Lip balm with SPF');
+    skincare.push(isDe ? '🧴 Sonnencreme LSF 30+' : '🧴 Sunscreen SPF 30+');
+    skincare.push(isDe ? '💧 Lippenpflege mit LSF' : '💧 Lip balm with SPF');
   }
   if (weather.temp < 5) {
-    skincare.push('🧴 Rich moisturizer');
-    skincare.push('💋 Lip balm');
+    skincare.push(isDe ? '🧴 Reichhaltige Creme' : '🧴 Rich moisturizer');
+    skincare.push(isDe ? '💋 Lippenpflege' : '💋 Lip balm');
   }
-  if (weather.temp >= 5 && weather.temp <= 22) {
-    skincare.push('🧴 Light moisturizer');
-  }
-
-  notes.push('👟 Comfy walking shoes');
-  if (weather.precipitation > 2) {
-    notes.push('🥾 Waterproof footwear');
-  }
+  
+  notes.push(isDe ? '👟 Bequeme Wanderschuhe' : '👟 Comfy walking shoes');
 
   return { clothing, skincare, notes };
 }
 
-function getForecastIcon(code: number): string {
-  if (code >= 95) return '⛈️';
-  if (code >= 80) return '🌦️';
-  if (code >= 71) return '🌨️';
-  if (code >= 51) return '🌧️';
-  if (code >= 45) return '🌫️';
-  if (code >= 3) return '☁️';
-  if (code >= 1) return '🌤️';
-  return '☀️';
-}
-
 export function WeatherPackingCard() {
-  const { selectedCity } = usePlanner();
+  const { selectedCity, t, lang } = usePlanner();
   const { weather, loading, error } = useWeather(selectedCity.center[0], selectedCity.center[1]);
 
   if (loading) {
@@ -77,12 +61,12 @@ export function WeatherPackingCard() {
   if (error || !weather) {
     return (
       <div className="bg-card border border-border rounded-xl p-4 shadow-card text-center">
-        <p className="text-xs text-muted-foreground">Weather data unavailable</p>
+        <p className="text-xs text-muted-foreground">{t('weatherUnavailable')}</p>
       </div>
     );
   }
 
-  const suggestions = getPackingSuggestions(weather);
+  const suggestions = getPackingSuggestions(weather, lang);
 
   return (
     <motion.div
@@ -94,9 +78,9 @@ export function WeatherPackingCard() {
       <div className="px-4 pt-3.5 pb-2">
         <div className="flex items-center gap-2 mb-0.5">
           <span className="text-base">🌤️</span>
-          <span className="text-sm font-bold text-foreground">Weather & Packing</span>
+          <span className="text-sm font-bold text-foreground">{t('weatherPacking')}</span>
         </div>
-        <p className="text-[11px] text-muted-foreground">What to wear & bring today</p>
+        <p className="text-[11px] text-muted-foreground">{t('whatToWear')}</p>
       </div>
 
       {/* Forecast card */}
@@ -124,7 +108,7 @@ export function WeatherPackingCard() {
       <div className="px-4 pb-2">
         <div className="flex items-center gap-1.5 mb-1.5">
           <Shirt className="w-3.5 h-3.5 text-primary" />
-          <span className="text-[11px] font-semibold text-foreground uppercase tracking-wider">Clothing</span>
+          <span className="text-[11px] font-semibold text-foreground uppercase tracking-wider">{t('clothing')}</span>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {suggestions.clothing.map((item, i) => (
@@ -140,7 +124,7 @@ export function WeatherPackingCard() {
         <div className="px-4 pb-2">
           <div className="flex items-center gap-1.5 mb-1.5">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
-            <span className="text-[11px] font-semibold text-foreground uppercase tracking-wider">Skincare</span>
+            <span className="text-[11px] font-semibold text-foreground uppercase tracking-wider">{t('skincare')}</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {suggestions.skincare.map((item, i) => (
@@ -156,7 +140,7 @@ export function WeatherPackingCard() {
       <div className="px-4 pb-3.5">
         <div className="flex items-center gap-1.5 mb-1.5">
           <Umbrella className="w-3.5 h-3.5 text-primary" />
-          <span className="text-[11px] font-semibold text-foreground uppercase tracking-wider">Notes</span>
+          <span className="text-[11px] font-semibold text-foreground uppercase tracking-wider">{t('notes')}</span>
         </div>
         <div className="space-y-1">
           {suggestions.notes.map((note, i) => (

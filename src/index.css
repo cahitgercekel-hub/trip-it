@@ -162,12 +162,37 @@ input[type="range"]::-moz-range-thumb {
   font-size: 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   border: 2.5px solid white;
+  text-shadow: 0 0 2px rgba(255,255,255,0.8);
 }
 .marker-culture {
   background: hsl(234 89% 64%);
 }
 .marker-nature {
   background: hsl(152 69% 40%);
+}
+.marker-food-drink {
+  background: hsl(24 95% 53%);
+}
+.marker-entertainment {
+  background: hsl(280 80% 60%);
+}
+.marker-shopping {
+  background: hsl(330 80% 60%);
+}
+.marker-history {
+  background: hsl(30 60% 45%);
+}
+.marker-nightlife {
+  background: hsl(250 70% 40%);
+}
+.marker-relaxation {
+  background: hsl(180 70% 45%);
+}
+.marker-family {
+  background: hsl(45 95% 50%);
+}
+.marker-hidden-gems {
+  background: hsl(160 80% 40%);
 }
 
 /* ─── Sidebar range slider with filled active track ─── */
