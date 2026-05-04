@@ -35,7 +35,9 @@ function MapPage() {
       <header className="h-14 min-h-[56px] flex items-center justify-between px-5 border-b border-border bg-card z-50">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <img src="/logo.svg" alt="Trip It Logo" className="w-9 h-9" />
+            <div className="bg-white p-1 rounded-lg shadow-sm border border-border">
+              <img src="/logo_trip_it.png" alt="Trip It Logo" className="w-8 h-8" />
+            </div>
             <h1 className="text-lg font-bold text-foreground tracking-tight">Trip It!</h1>
             <TutorialModal dark />
           </div>

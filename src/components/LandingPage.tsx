@@ -29,8 +29,10 @@ export function LandingPage() {
       <div className="flex-1 flex flex-col items-center justify-start pt-16 md:pt-24 p-6 z-10 w-full max-w-5xl mx-auto">
         {/* Header */}
         <header className="flex flex-col items-center text-center mb-14">
-          <div className="flex items-center gap-3 mb-2">
-            <img src="/logo.svg" alt="Trip It Logo" className="w-16 h-16 drop-shadow-lg" />
+          <div className="flex items-center gap-4 mb-2">
+            <div className="bg-white p-2 rounded-2xl shadow-xl">
+              <img src="/logo_trip_it.png" alt="Trip It Logo" className="w-16 h-16" />
+            </div>
             <div className="text-left">
               <h1 className="text-4xl font-extrabold text-white tracking-tighter flex items-center gap-2 drop-shadow-md">
                 {t('title')} <TutorialModal />

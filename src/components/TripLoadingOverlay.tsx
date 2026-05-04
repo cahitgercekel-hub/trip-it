@@ -19,7 +19,9 @@ export function TripLoadingOverlay() {
       className="absolute inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm"
     >
       <div className="flex flex-col items-center gap-6 max-w-xs text-center">
-        <img src="/logo.svg" alt="Trip It Logo" className="w-16 h-16 mb-2" />
+        <div className="bg-white p-2 rounded-2xl shadow-xl">
+          <img src="/logo_trip_it.png" alt="Trip It Logo" className="w-16 h-16" />
+        </div>
         
         {/* Pulsing ring animation */}
         <div className="relative w-20 h-20">
